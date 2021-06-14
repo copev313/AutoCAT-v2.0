@@ -24,3 +24,5 @@
     ```
 
 ### Notes:
+
+ - TODO: Handle a comma seperated list of email addresses so that the process can be repeated for multiple accounts at once.

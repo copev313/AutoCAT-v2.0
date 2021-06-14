@@ -33,6 +33,13 @@ backend_vendor_search = {
     "//div[@id='main']/div[1]/div/div[1]/ul/li[3]/a",
 }
 
+account_details_tab = {
+  "VENDOR_HEADER":
+    "//div[@id='breadcrumb']/ul/li/span",
+
+  "COMPANY_NAME_FIELD":
+    "//input[@id='taxid']",
+}
 
 ''' ***** DEFINE CONSTANTS ***** '''
 
@@ -46,3 +53,7 @@ SEARCH_IN_BUTTON        = backend_login_portal["SEARCH_IN_BUTTON"]
 SEARCH_IN_USERS_DD      = backend_vendor_search["SEARCH_IN_USERS_DD"]
 SEARCH_BAR_FIELD        = backend_vendor_search["SEARCH_BAR_FIELD"]
 COMPANY_DETAILS_TAB     = backend_vendor_search["COMPANY_DETAILS_TAB"]
+
+# Copy/Paste Brand Name:
+VENDOR_HEADER           = account_details_tab["VENDOR_HEADER"]
+COMPANY_NAME_FIELD      = account_details_tab["COMPANY_NAME_FIELD"]
