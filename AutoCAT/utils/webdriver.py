@@ -54,19 +54,23 @@ class WebDriver:
     def __init__(self, flags=None, exp_opts=None):
         self._flags = flags if flags else DEFAULT_FLAGS
         self._exp_opts = exp_opts if exp_opts else EXP_OPTS
-        
+
+
     @property
     def flags(self):
         return self._flags
+
 
     @property
     def exp_opts(self):
         return self._exp_opts
 
+
     @property
     def headless(self):
         return self._headless
-    
+
+
     def _build_options(self):
         '''Builds a ChromeOptions object for specifying special config settings
         for our Chrome webdriver.
@@ -82,7 +86,8 @@ class WebDriver:
             _opts.add_argument(flag)
         _opts.add_experimental_option("excludeSwitches", self._exp_opts)
         return _opts
-    
+
+
     def initialize_driver(self, headless=False):
         '''
         Initializes and returns a Google Chrome webdriver used to perform

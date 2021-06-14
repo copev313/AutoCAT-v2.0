@@ -3,10 +3,12 @@ app.py
 ------
     Our entry point for getting our Gooey GUI initialized and running.
 '''
+import sys
+
 from gooey import Gooey, GooeyParser
 
-from utils.helper_funcs import print_admin_info, check_email
 from procedures.pre_decision import Procedure
+from utils.helper_funcs import print_admin_info, check_email
 from utils.webdriver import WebDriver
 
 
@@ -38,8 +40,7 @@ def main():
     try:
         # Initialize our WebDriver + Procedures classes:
         print("\n🐱  AUTOCAT >>> Launching . . .")
-        wd = WebDriver()
-        driver = wd.initialize_driver()
+        driver = WebDriver().initialize_driver()
         procedure = Procedure(driver)
 
         # Print Admin Login Info to Console (password censored):
@@ -56,13 +57,12 @@ def main():
 
         ''' ***** BEGIN CAT BUILD PROCESS ***** '''
         # Log into backend as admin:
-        #procedure.backend_admin_login()
+        procedure.backend_admin_login()
 
         # Search for the Vendor's vendor page by email:
-        #procedure.backend_vendor_search(args.Vendor)
+        procedure.vendor_email_search(args.Vendor)
 
         ''' ***** END CAT BUILD PROCESS ***** '''
-
 
     except KeyboardInterrupt:
         print("TEST CANCELLED!")
@@ -80,5 +80,6 @@ def main():
         sys.exit(1)
 
 
+# Run Gooey Program:
 if __name__ == '__main__':
     main()
