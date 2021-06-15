@@ -29,16 +29,34 @@ backend_vendor_search = {
   "SEARCH_BAR_FIELD":
     __SEARCH_IN_ROOT + "/input",
 
+  # may not need this xpath/element
   "COMPANY_DETAILS_TAB":
     "//div[@id='main']/div[1]/div/div[1]/ul/li[3]/a",
 }
 
 account_details_tab = {
   "VENDOR_HEADER":
-    "//div[@id='breadcrumb']/ul/li/span",
+    "//*[@id='breadcrumb']/ul/li/span",
 
   "COMPANY_NAME_FIELD":
     "//input[@id='taxid']",
+}
+
+company_address_tab = {
+  "QUESTIONS_EMAIL_FIELD":
+    "//input[@id='product-questions-admin-email']",
+
+  "COUNTRY_DD":
+    "//select[@id='location-country']",
+
+  "STATE_AS_DD":
+    "//select[@id='location-state']",
+
+  "STATE_AS_FIELD":
+    "//input[@id='location-custom-state']",
+
+  "CITY_FIELD":
+    "//input[@id='location-city']",
 }
 
 ''' ***** DEFINE CONSTANTS ***** '''
@@ -54,6 +72,13 @@ SEARCH_IN_USERS_DD      = backend_vendor_search["SEARCH_IN_USERS_DD"]
 SEARCH_BAR_FIELD        = backend_vendor_search["SEARCH_BAR_FIELD"]
 COMPANY_DETAILS_TAB     = backend_vendor_search["COMPANY_DETAILS_TAB"]
 
-# Copy/Paste Brand Name:
+# Account Details Tab:
 VENDOR_HEADER           = account_details_tab["VENDOR_HEADER"]
 COMPANY_NAME_FIELD      = account_details_tab["COMPANY_NAME_FIELD"]
+
+# Company Address Tab:
+QUESTIONS_EMAIL_FIELD   = company_address_tab["QUESTIONS_EMAIL_FIELD"]
+COUNTRY_DD              = company_address_tab["COUNTRY_DD"]
+STATE_AS_DD             = company_address_tab["STATE_AS_DD"]
+STATE_AS_FIELD          = company_address_tab["STATE_AS_FIELD"]
+CITY_FIELD              = company_address_tab["CITY_FIELD"]

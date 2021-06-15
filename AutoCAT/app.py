@@ -62,6 +62,9 @@ def main():
         # Search for the Vendor's vendor page by email:
         procedure.vendor_email_search(args.Vendor)
 
+        # ACCOUNT DETAILS TAB -->
+        procedure.complete_account_details_tab()
+
         ''' ***** END CAT BUILD PROCESS ***** '''
 
     except KeyboardInterrupt:
