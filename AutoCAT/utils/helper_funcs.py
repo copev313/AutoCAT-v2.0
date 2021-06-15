@@ -9,7 +9,7 @@ import re
 from dotenv import load_dotenv
 
 
-def print_admin_info():
+def print_admin_info() -> None:
     '''Prints the account info for the admin user.'''
     load_dotenv()
     email = os.environ.get("ADMIN_EMAIL")
@@ -20,12 +20,17 @@ def print_admin_info():
     print(f"ADMIN_EMAIL: {email} \nADMIN_PASSWORD: {pswd}")
 
 
-def check_email(email_address):
+def check_email(email_address: str) -> bool:
+    '''Validates that the given string is an email address.'''
     regex = "^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$"
     return True if re.search(regex, email_address) else False
 
 
-def abbreviate_state(state):
+def _abbreviate_state(state: str) -> str:
+    '''Given a state of the US, returns the appropriate abbreviation.
+
+        * Used as a part of address_handler function. * 
+    '''
     abbr_dict = {
         'ALABAMA': 'AL',
         'ALASKA': 'AK',
@@ -84,8 +89,20 @@ def abbreviate_state(state):
         'WYOMING': 'WY',
     }
 
-    state = state.upper()
+    state = state.upper().strip()
     if state in abbr_dict.keys():
         return abbr_dict[state]
     else:
-        return None
+        return state.title()
+
+
+def address_handler(country: str = '', state: str = '', city: str ='') -> str:
+    # [CASE] Country is United States -> Return {city, state abbreviation}:
+    if (country == 'United States'):
+        state_abbr = _abbreviate_state(state)
+        city = city.title()
+        return f"{city}, {state_abbr}"
+
+    # [CASE] Country other than US:
+    state = state.title()
+    return f"{state}, {country}"

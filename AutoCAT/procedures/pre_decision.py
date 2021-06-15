@@ -35,7 +35,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from utils.helper_funcs import abbreviate_state
+from utils.helper_funcs import address_handler
 
 
 class Procedure:
@@ -144,11 +144,8 @@ class Procedure:
                     (By.XPATH, SEARCH_IN_BUTTON)
                 )
             )
-            current_url = _driver.current_url
-            assert current_url == os.environ.get("BACKEND_LANDING_URL")
 
-            # Set the vendor's profile_id from the URL:
-            self._profile_id = current_url.split('=')[-1]
+            assert _driver.current_url == os.environ.get("BACKEND_LANDING_URL")
             print("\n🐱  AUTOCAT >>> Login Successfully!")
         except TimeoutError:
             print("\nTIMEOUT ERROR: Couldn't confirm successfully login!")
@@ -221,18 +218,21 @@ class Procedure:
         # COPY the Brand Name:
         _vendor_header = _driver.find_element_by_xpath(VENDOR_HEADER)
         header_txt = _vendor_header.text
-        print(header_txt)
         parsed_header = header_txt.split('(')
         email_address = parsed_header[0].strip()
         brand_name = parsed_header[1].replace(')', '').strip()
-        print(f"Brand Name: {brand_name}\nEmail Address: {email_address}")  # debugging!
+        print(f"Brand Name: {brand_name}\nEmail Address: {email_address}")  # debugs!
+
+        # Set the vendor's profile_id from the URL:
+        current_url = _driver.current_url
+        self._profile_id = current_url.split('=')[-1]
+        print("Profile Id: " + self._profile_id)    # debugs!
 
         # PASTE the Brand Name:
         _company_name_field = _driver.find_element_by_xpath(COMPANY_NAME_FIELD)
         _company_name_field.clear()
         _company_name_field.send_keys(brand_name)
         _company_name_field.send_keys(Keys.RETURN)
-        
 
         # [CHECK] Confirm we successfully saved changes:
         try:
@@ -261,7 +261,7 @@ class Procedure:
         self._vendor_email_address = email_address.lower()
         print("\n✔️  AUTOCAT >>> 'Account Details Tab' - TASK COMPLETE!")
 
-"""
+
     def complete_company_address_tab(self):
         '''Pastes the vendor's email address into the appropriate field and
         copies/stores the city and state information (if applicable).'''
@@ -272,6 +272,7 @@ class Procedure:
         next_tab_url = "{root}?target=companyAddress&profile_id={id}".format(
                         root=os.environ.get("BACKEND_LANDING_URL"),
                         id=self._profile_id)
+
         # Got to our tab via URL:
         _driver.get(next_tab_url)
 
@@ -287,4 +288,50 @@ class Procedure:
                 was opened!")
             _driver.quit()
             return
-"""
+
+        # Paste email address into 'Product questions e-mail' field:
+        _email_field =  _driver.find_element_by_xpath(QUESTIONS_EMAIL_FIELD)
+        _email_field.clear()
+        _email_field.send_keys(self._vendor_email_address)
+        _email_field.send_keys(Keys.RETURN)
+
+        # [CHECK] The page has reloaded after submit:
+        try:
+            WebDriverWait(_driver, self.TIMEOUT).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, COUNTRY_DD)
+                )
+            )
+        except TimeoutError:
+            print("\nTIMEOUT ERROR: Couldn't confirm the company address tab \
+                submitted successfully!")
+            _driver.quit()
+            return
+
+        # Handle Country Dropdown:
+        _country_dd = _driver.find_element_by_xpath(COUNTRY_DD)
+        _country_selected = _country_dd.find_element_by_xpath("//*[@selected='selected']")
+        print("COUNTRY: " + _country_selected.text)   # debugs!
+        self._company_country = _country_selected.text
+
+        # Handle State:
+        # [CASE] Country is United States --> Use the dropdown XPATH:
+        if (self._company_country == 'United States'):
+            _state_dd = _driver.find_element_by_xpath(STATE_AS_DD)
+            data_val = _state_dd.get_attribute('data-value')
+            _state_option = _state_dd.find_element_by_xpath(f"//*[@value='{data_val}']")
+            self._company_state = _state_option.text
+
+        # [CASE] Country is NOT U.S. --> Use the field XPATH:
+        else:
+            _state_field = _driver.find_element_by_xpath(STATE_AS_FIELD)
+            self._company_state = _state_field.get_attribute('value')
+
+        print("STATE: " + self._company_state)  # debugs!
+
+        # Handle City Field:
+        _city_field = _driver.find_element_by_xpath(CITY_FIELD)
+        self._company_city = _city_field.get_attribute('value')
+
+        print("CITY: " + self._company_city)  # debugs!
+        print("\n✔️  AUTOCAT >>> 'Company Address Tab' - TASK COMPLETE!")

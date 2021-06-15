@@ -64,6 +64,9 @@ def main():
 
         # ACCOUNT DETAILS TAB -->
         procedure.complete_account_details_tab()
+        
+        # COMPANY ADDRESS TAB -->
+        procedure.complete_company_address_tab()
 
         ''' ***** END CAT BUILD PROCESS ***** '''
 
@@ -78,7 +81,7 @@ def main():
         sys.exit(1)
 
     except Exception as err:
-        print(f"\nERROR ENCOUNTERED! CLOSING . . .\n{err}")
+        print(f"\nERROR ENCOUNTERED! CLOSING ...\n{err}")
         driver.close()
         sys.exit(1)
 

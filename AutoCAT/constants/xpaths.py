@@ -56,7 +56,7 @@ company_address_tab = {
     "//input[@id='location-custom-state']",
 
   "CITY_FIELD":
-    "//input[@id='location-city']",
+    "//*[@id='location-city']",
 }
 
 ''' ***** DEFINE CONSTANTS ***** '''
