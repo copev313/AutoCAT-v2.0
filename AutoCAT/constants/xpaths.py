@@ -59,6 +59,20 @@ company_address_tab = {
     "//*[@id='location-city']",
 }
 
+company_details_tab = {
+  "LOCATION_FIELD":
+    "//*[@id='vendorlocation']",
+
+  "WEBSITE_FIELD":
+    "//*[@id='companyfield-18']",
+
+  "COMPANY_DESC_FIELD":
+    "//*[@id='companyfield-32']",
+
+  "INSTAGRAM_FIELD":
+    "//*[@id='companyfield-33']",
+}
+
 ''' ***** DEFINE CONSTANTS ***** '''
 
 # Backend Admin Login:
@@ -82,3 +96,9 @@ COUNTRY_DD              = company_address_tab["COUNTRY_DD"]
 STATE_AS_DD             = company_address_tab["STATE_AS_DD"]
 STATE_AS_FIELD          = company_address_tab["STATE_AS_FIELD"]
 CITY_FIELD              = company_address_tab["CITY_FIELD"]
+
+# Company Details Tab:
+LOCATION_FIELD          = company_details_tab["LOCATION_FIELD"]
+WEBSITE_FIELD           = company_details_tab["WEBSITE_FIELD"]
+COMPANY_DESC_FIELD      = company_details_tab["COMPANY_DESC_FIELD"]
+INSTAGRAM_FIELD         = company_details_tab["INSTAGRAM_FIELD"]

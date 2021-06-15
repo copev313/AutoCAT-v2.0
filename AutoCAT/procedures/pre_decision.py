@@ -22,20 +22,26 @@ from constants.xpaths import (
     # Account Details Tab:
     VENDOR_HEADER,
     COMPANY_NAME_FIELD,
-    
+
     # Company Address Tab:
     QUESTIONS_EMAIL_FIELD,
     COUNTRY_DD,
     STATE_AS_DD,
     STATE_AS_FIELD,
     CITY_FIELD,
+
+    # Company Details Tab:
+    LOCATION_FIELD,
+    WEBSITE_FIELD,
+    COMPANY_DESC_FIELD,
+    INSTAGRAM_FIELD,
 )
 from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from utils.helper_funcs import address_handler
+from utils.helper_funcs import address_handler, print_admin_info, timer
 
 
 class Procedure:
@@ -71,6 +77,9 @@ class Procedure:
         self._company_country: str = ""
         self._company_state: str = ""
         self._company_city: str = ""
+        self._website_url: str = ""
+        self._instagram_handle: str = ""
+        self._company_description: str = ""
 
 
     @property
@@ -105,11 +114,15 @@ class Procedure:
             self._vendor_email_address = email
 
 
+    @timer
     def backend_admin_login(self):
         '''Executes the process required to log into the backend of the website.'''
-        print("\n⚙️  Backend Login Process starting . . .")
+        print("\n⚙️  ## Backend Admin Login ##")
         _driver = self._driver
         load_dotenv()
+
+        # Print Admin Login Info to Console (password censored):
+        print_admin_info()
 
         # Open browser to the login portal:
         _driver.get(os.environ.get("BACKEND_LOGIN_URL"))
@@ -144,9 +157,8 @@ class Procedure:
                     (By.XPATH, SEARCH_IN_BUTTON)
                 )
             )
-
             assert _driver.current_url == os.environ.get("BACKEND_LANDING_URL")
-            print("\n🐱  AUTOCAT >>> Login Successfully!")
+
         except TimeoutError:
             print("\nTIMEOUT ERROR: Couldn't confirm successfully login!")
             _driver.quit()
@@ -157,6 +169,7 @@ class Procedure:
             return
 
 
+    @timer
     def vendor_email_search(self, email_address):
         '''Executes the process for looking up a vendor by email address with the
         backend search engine.
@@ -167,7 +180,8 @@ class Procedure:
                 The vendor's email address for searching purposes.
         '''
         _driver = self._driver
-
+        print("\n🐱  ## Vendor Email Search ##")
+        
         # Confirm the we re successfully logged in:
         try:
             WebDriverWait(_driver, self.TIMEOUT).until(
@@ -197,10 +211,11 @@ class Procedure:
         _search_bar.send_keys(Keys.RETURN)
 
 
+    @timer
     def complete_account_details_tab(self):
         '''Copy and pastes the brand name into the 'Company name' field on the
         Company Details tab.'''
-        print("\n🐱  AUTOCAT >>> Beginning Task: 'Account Details Tab'")
+        print("\n🐱  ## Account Details Tab ##")
         _driver = self._driver
 
         # [CHECK] Confirm we successfully found out vendor page:
@@ -221,12 +236,11 @@ class Procedure:
         parsed_header = header_txt.split('(')
         email_address = parsed_header[0].strip()
         brand_name = parsed_header[1].replace(')', '').strip()
-        print(f"Brand Name: {brand_name}\nEmail Address: {email_address}")  # debugs!
+        print(f"Brand Name: {brand_name}\nEmail Address: {email_address}")
 
         # Set the vendor's profile_id from the URL:
         current_url = _driver.current_url
         self._profile_id = current_url.split('=')[-1]
-        print("Profile Id: " + self._profile_id)    # debugs!
 
         # PASTE the Brand Name:
         _company_name_field = _driver.find_element_by_xpath(COMPANY_NAME_FIELD)
@@ -259,24 +273,24 @@ class Procedure:
 
         # Store the vendor's email address from the Vendor's page (lowercase):
         self._vendor_email_address = email_address.lower()
-        print("\n✔️  AUTOCAT >>> 'Account Details Tab' - TASK COMPLETE!")
 
 
+    @timer
     def complete_company_address_tab(self):
         '''Pastes the vendor's email address into the appropriate field and
-        copies/stores the city and state information (if applicable).'''
-        print("\n🐱  AUTOCAT >>> Beginning Task: 'Company Address Tab'")
+        stores the city and state information for use in the next tab.'''
+        print("\n🐱  ## Company Address Tab ##")
         _driver = self._driver
 
         # Form the URL for the Company Address tab:
-        next_tab_url = "{root}?target=companyAddress&profile_id={id}".format(
+        address_tab_url = "{root}?target=companyAddress&profile_id={id}".format(
                         root=os.environ.get("BACKEND_LANDING_URL"),
                         id=self._profile_id)
 
         # Got to our tab via URL:
-        _driver.get(next_tab_url)
+        _driver.get(address_tab_url)
 
-        # [CHECK] Confirm we successfully found out vendor page:
+        # [CHECK] Confirm we successfully found our vendor page:
         try:
             WebDriverWait(_driver, self.TIMEOUT).until(
                 EC.presence_of_element_located(
@@ -311,7 +325,7 @@ class Procedure:
         # Handle Country Dropdown:
         _country_dd = _driver.find_element_by_xpath(COUNTRY_DD)
         _country_selected = _country_dd.find_element_by_xpath("//*[@selected='selected']")
-        print("COUNTRY: " + _country_selected.text)   # debugs!
+        print("Country: " + _country_selected.text)
         self._company_country = _country_selected.text
 
         # Handle State:
@@ -321,17 +335,82 @@ class Procedure:
             data_val = _state_dd.get_attribute('data-value')
             _state_option = _state_dd.find_element_by_xpath(f"//*[@value='{data_val}']")
             self._company_state = _state_option.text
-
         # [CASE] Country is NOT U.S. --> Use the field XPATH:
         else:
             _state_field = _driver.find_element_by_xpath(STATE_AS_FIELD)
             self._company_state = _state_field.get_attribute('value')
-
-        print("STATE: " + self._company_state)  # debugs!
+        print("State: " + self._company_state)
 
         # Handle City Field:
         _city_field = _driver.find_element_by_xpath(CITY_FIELD)
         self._company_city = _city_field.get_attribute('value')
+        print("City: " + self._company_city)
 
-        print("CITY: " + self._company_city)  # debugs!
-        print("\n✔️  AUTOCAT >>> 'Company Address Tab' - TASK COMPLETE!")
+
+    @timer
+    def complete_company_details_tab(self):
+        '''Overwrites the inforamtion in the 'Location' field with the
+        appropriately formatted location.
+        
+        Stores the 'Company Description' field ofr later use.
+
+        Formats the 'Instagram Handle' field (if applicable).
+
+        Stores the website URL from the 'Website or Link to...' field to
+        launch the site upon the completion of the current tab.
+        '''
+        print("\n🐱  ## Company Details Tab ##")
+        _driver = self._driver
+
+        # Form the URL for the Company Address tab:
+        company_details_tab_url = "{root}?target=vendor&profile_id={id}".format(
+                                    root=os.environ.get("BACKEND_LANDING_URL"),
+                                    id=self._profile_id)
+
+        # Got to our tab via URL:
+        _driver.get(company_details_tab_url)
+
+        # [CHECK] Page Successfully Loaded:
+        try:
+            WebDriverWait(_driver, self.TIMEOUT).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, LOCATION_FIELD)
+                )
+            )
+        except TimeoutError:
+            print("\nTIMEOUT ERROR: Couldn't confirm the company details tab \
+                was opened!")
+            _driver.quit()
+            return
+
+        _location_field = _driver.find_element_by_xpath(LOCATION_FIELD)
+        address = address_handler(country=self._company_country,
+                                  state=self._company_state,
+                                  city=self._company_city)
+        print("ADDRESS:  " + address)  # debugs!
+        # Replace location imformation:
+        _location_field.clear()
+        _location_field.send_keys(address)
+
+        # Store website URL so we can launch it later:
+        _website_field = _driver.find_element_by_xpath(WEBSITE_FIELD)
+        self._website_url =  _website_field.get_attribute('value')
+        print("SITE URL:  " + self._website_url)
+
+        # Store the company description:
+        _company_desc_field = _driver.find_element_by_xpath(COMPANY_DESC_FIELD)
+        self._company_description = _company_desc_field.text
+
+        # Handle formatting & storing instagram handle (if applicable):
+        _instagram_field = _driver.find_element_by_xpath(INSTAGRAM_FIELD)
+        instagram = _instagram_field.get_attribute('value')
+        if instagram:
+            found_url = instagram.find('.com')
+            # [CASE] Contains '@' -> Removed @:
+            if '@' in instagram:
+                instagram = instagram.replace('@', '')
+            # [CASE] Is URL -> Strip to instragram handle only:
+            if (found_url != -1):
+                splitted = instagram.split('/')
+                instagram = splitted[-2] or splitted[-1]
+            print("INSTAGRAM:  " + instagram)

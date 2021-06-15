@@ -5,8 +5,20 @@ helper_funcs.py
 '''
 import os
 import re
+import time
 
 from dotenv import load_dotenv
+
+
+def timer(func):
+    '''A decorator function to measure execute time of functions.'''
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        finish = time.time()
+        print(f" === Function '{func.__name__}' executed in {round(finish - start, 2)} seconds. ===")
+        return result
+    return wrapper
 
 
 def print_admin_info() -> None:

@@ -85,6 +85,8 @@ class WebDriver:
         for flag in self._flags:
             _opts.add_argument(flag)
         _opts.add_experimental_option("excludeSwitches", self._exp_opts)
+        # Supposed to keep the browser open, we'll see:
+        _opts.add_experimental_option("detach", True)
         return _opts
 
 
