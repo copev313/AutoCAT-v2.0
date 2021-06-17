@@ -3,19 +3,25 @@ app.py
 ------
     Our entry point for getting our Gooey GUI initialized and running.
 '''
+import os
 import sys
-import time
+from time import time
 
+import validators
 from gooey import Gooey, GooeyParser
 
-from procedures.pre_decision import Procedure
+import procedures.prereview as prereview
+import procedures.approval as approval
 from utils.helper_funcs import check_email
 from utils.webdriver import WebDriver
 
 
 @Gooey(program_name="AutoCAT: The Automation You Need For the Jobs You Don't!",
-       description="\nThis program is intended for pre-decision Boutsy" \
-        " category builds.",
+       image_dir=".\images",
+       header_bg_color = "#828A9E",
+       body_bg_color = "#D3D5DB",
+       footer_bg_color = "#828A9E",
+       richtext_controls = True,
        default_size=(550, 450),
        required_cols=1)
 def goopy():
@@ -23,77 +29,94 @@ def goopy():
     The main function responsible for parsing our arguments and building our
     Gooey GUI.
     '''
-    parser = GooeyParser(prog="AutoCAT",
-                         description="\nThis program is intended for pre-decision Boutsy" \
-                            " category builds.")
+    parser = GooeyParser(
+        prog="AutoCAT",
+        description="\nThis program is intended to perform Boutsy category builds.")
 
-    parser.add_argument("Vendor",
-                        action="store",
-                        type=str,
-                        help="Vendor's email address:")
+    # Vendor Email field:
+    parser.add_argument(
+        "Vendor",
+        action="store",
+        type=str,
+        help="Vendor's email address:",
+    )
 
-    parser.add_argument("--Headless",
-                        action="store_true",
-                        help=" Run process in headless mode?")
+    parser.add_argument(
+        "Process",
+        metavar = "Choose Process",
+        widget="Dropdown",
+        choices=["Pre-Review", "Approval"],
+        gooey_options = {
+            'readonly': True,
+            'validator': {
+                'test': "user_input == 'Pre-Review' or user_input == 'Approval'" ,
+                'message': "Choose a process from the options"
+            }
+        }
+    )
 
+    # Grab user's input:
     args = parser.parse_args()
 
-    print("\n🐱  AUTOCAT >>> Launching . . .")
-     # Validation for Vendor's Email:
-    if (not check_email(args.Vendor)):
-        print("Vendor field requires an email address!")
+
+    ''' ***** WINDOW LOGIC *****'''
+    print("\nLaunching . . .")
+    vendor_email = args.Vendor
+    selected_process = args.Process
+
+    # Validation for Vendor Emails:
+    if not validators.email(vendor_email):
+        print("Vendor field may only contain email addresses!")
         raise ValueError
-    
-    # Initialize our WebDriver + Procedures classes:
-    driver = WebDriver().initialize_driver()
-    procedure = Procedure(driver)
 
-    
+    # [CASE] Run 'Pre-Review' Process:
+    if (selected_process == 'Pre-Review'):
 
-    # Headless Handler:
-    if (bool(args.Headless)):
-        print("\nRunning in headless mode!")
-        # TODO: Implement this option later . . .
+        # Initialize our WebDriver + Procedures classes:
+        driver = WebDriver().initialize_driver()
+        pr_procedure = prereview.PreReviewProcess(driver)
+
+        # Log into backend as admin:
+        pr_procedure.backend_admin_login()
+        # Search for the Vendor's vendor page by email:
+        pr_procedure.vendor_email_search(vendor_email)
+
+        # "ACCOUNT DETAILS" TAB -->
+        pr_procedure.complete_account_details_tab()
+        # "COMPANY ADDRESS" TAB -->
+        pr_procedure.complete_company_address_tab()
+        # "COMPANY DETAILS" TAB -->
+        pr_procedure.complete_company_details_tab()
+
+        # Open Vendor's Site in New Tab:
+        pr_procedure.launch_vendor_website()
+
+    # [CASE] Run 'Approval' Process:
+    elif (selected_process == 'Approval'):
+
+        # Initialize our WebDriver + Procedures classes:
+        #driver = WebDriver().initialize_driver()
+        #appr_procedure = approval.ApprovalProcess(driver)
 
 
-    ''' ***** BEGIN CAT BUILD PROCESS ***** '''
-    # Log into backend as admin:
-    procedure.backend_admin_login()
-
-    # Search for the Vendor's vendor page by email:
-    procedure.vendor_email_search(args.Vendor)
-
-    # ACCOUNT DETAILS TAB -->
-    procedure.complete_account_details_tab()
-
-    # COMPANY ADDRESS TAB -->
-    procedure.complete_company_address_tab()
-
-    # COMPANY DETAILS TAB -->
-    procedure.complete_company_details_tab()
-
-    ''' ***** END CAT BUILD PROCESS ***** '''
+    else:
+        raise ValueError("Somehow an invalid process option was selected!")
 
 
 # Run Gooey Program:
 if __name__ == '__main__':
 
     try:
-        start_time = time.time()
+        start = time()
         goopy()
-        interval = time.time() - start_time
-        print(f"\n ---------- Completed in { round(interval, 3) } seconds total. ---------- ")
+        print(f"\n ----- Completed in { round(time() - start, 3) } seconds total. -----")
 
     except KeyboardInterrupt:
-        print("TEST CANCELLED!")
-        driver.close()
+        print("CANCELLED!")
         sys.exit(1)
-
     except ValueError as err:
-        print(str(err))
-        driver.close()
+        print(f"\nVALUE ERROR: {str(err)}")
         sys.exit(1)
-
     except Exception as err:
         print(f"\nERROR ENCOUNTERED! CLOSING ...\n{err}")
         sys.exit(1)
