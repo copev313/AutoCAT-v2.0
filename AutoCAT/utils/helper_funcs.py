@@ -16,7 +16,7 @@ def timer(func):
         start = time.time()
         result = func(*args, **kwargs)
         finish = time.time()
-        print(f" === Function '{func.__name__}' executed in {round(finish - start, 2)} seconds. ===")
+        print(f"(Completed '{func.__name__}' in {round(finish - start, 2)} sec.)")
         return result
     return wrapper
 
@@ -36,6 +36,32 @@ def check_email(email_address: str) -> bool:
     '''Validates that the given string is an email address.'''
     regex = "^(\w|\.|\_|\-)+[@](\w|\_|\-|\.)+[.]\w{2,3}$"
     return True if re.search(regex, email_address) else False
+
+
+def element_has_class(element_obj, class_name: str) -> bool:
+    '''Returns a boolean of whether a web element contains a specific class name.'''
+    classes = element_obj.get_attribute('class')
+    for cl in classes.split(' '):
+        if (cl == class_name):
+            return True
+    return False
+
+
+def wait_for_save(driver, xpath: str, cls_name: str = 'disabled') -> None:
+    '''Pauses program to wait for data to be saved successfully. Waits for
+    the submit/update button to be disabled after inputting data and submitting.
+    '''
+    # Wait for the element to have the class 'classy':
+    _d = driver
+    elem = _d.find_element_by_xpath(xpath)
+    classy = element_has_class(elem, cls_name)
+    # While the element doesn't have that class, pause then try again:
+    while not classy:
+        # Wait a sec:
+        time.sleep(1)
+        elem = _d.find_element_by_xpath(xpath)
+        classy = element_has_class(elem, cls_name)
+    return None
 
 
 def _abbreviate_state(state: str) -> str:
@@ -109,6 +135,8 @@ def _abbreviate_state(state: str) -> str:
 
 
 def address_handler(country: str = '', state: str = '', city: str ='') -> str:
+    '''Returns the appropriately formatted address based on the given
+    country.'''
     # [CASE] Country is United States -> Return {city, state abbreviation}:
     if (country == 'United States'):
         state_abbr = _abbreviate_state(state)
