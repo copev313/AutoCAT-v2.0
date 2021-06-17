@@ -53,7 +53,8 @@ from utils.helper_funcs import (
 
 
 class PreReviewProcess:
-    '''Class used to trigger common procedures using the selenium webdriver.
+    '''Class used to trigger common procedures for the prereview process
+    using the selenium webdriver.
 
     Attributes:
     ----------
@@ -97,37 +98,6 @@ class PreReviewProcess:
         self._company_city: str = ""
         self._website_url: str = ""
         self._instagram_handle: str = ""
-
-
-    @property
-    def profile_id(self):
-        '''Returns the vendor's profile id.'''
-        return self._profile_id
-
-    @property
-    def vendor_email_address(self):
-        '''Returns the vendor's email address.'''
-        return self._vendor_email_address
-
-    @profile_id.setter
-    def profile_id(self, id: str) -> None:
-        '''Sets the vendor's profile id.'''
-        # [CASE] The id value is not an int or str --> raise error.
-        if ((type(id) is not str) or (type(id) is not int)):
-            raise ValueError(
-                "Property 'profile_id' must be of type int or str")
-        else:
-            self._profile_id = str(id)
-
-    @vendor_email_address.setter
-    def vendor_email_address(self, email: str) -> None:
-        '''Sets the vendor's email address.'''
-        # [CASE] The variable 'email' is a not a string --> raise error.
-        if (type(email) is not str):
-            raise ValueError(
-                "Property 'vendor_email_address' must be of type str")
-        else:
-            self._vendor_email_address = email
 
 
     @timer
@@ -482,7 +452,7 @@ class PreReviewProcess:
             _driver.execute_script("window.open('');")
             # Switch to new tab:
             _driver.switch_to.window(_driver.window_handles[1])
-            # Go to website;
+            # Go to website:
             _driver.get(self._website_url)
-            # Wait a few second:
+            # Wait a second:
             sleep(1)
