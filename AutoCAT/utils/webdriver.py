@@ -10,7 +10,7 @@ from selenium import webdriver
 # Our default & experimental option flags for configuring our Chrome webdriver:
 DEFAULT_FLAGS = ["--start-maximized",
                  "--incognito",
-                 "--disable-notifcations",
+                 "--disable-notifications",
                  "--disable-extensions"]
 
 EXP_OPTS = ["enable-automation",
@@ -41,34 +41,23 @@ class WebDriver:
         exp_opts : list [str]
             Returns the experimental flags of the given instance of WebBrowser.
 
-        headless : bool
-            Returns whether headless mode is enabled for the given instance of
-            WebBrowser.
-
     Methods
     -------
         initialize_driver(headless=False):
             Initializes the Selenium webdriver object.
     '''
     
-    def __init__(self, flags=None, exp_opts=None):
+    def __init__(self, flags: list = None, exp_opts: list = None):
         self._flags = flags if flags else DEFAULT_FLAGS
         self._exp_opts = exp_opts if exp_opts else EXP_OPTS
-
 
     @property
     def flags(self):
         return self._flags
 
-
     @property
     def exp_opts(self):
         return self._exp_opts
-
-
-    @property
-    def headless(self):
-        return self._headless
 
 
     def _build_options(self):
@@ -85,29 +74,17 @@ class WebDriver:
         for flag in self._flags:
             _opts.add_argument(flag)
         _opts.add_experimental_option("excludeSwitches", self._exp_opts)
-        # Supposed to keep the browser open, we'll see:
+        # Supposed to keep the browser open:
         _opts.add_experimental_option("detach", True)
         return _opts
 
 
-    def initialize_driver(self, headless=False):
-        '''
-        Initializes and returns a Google Chrome webdriver used to perform
+    def initialize_driver(self):
+        '''Initializes and returns a Google Chrome webdriver used to perform
         automated tasks in the browser.
-
-        Parameters
-        ----------
-            headless: bool, optional
-                Whether the webdriver will be ran in headless mode when
-                initialized. (Default False)
 
         Returns
         -------
-            _driver : webdriver.Chrome object
-                A Selenium Chrome webdriver.
-
+            webdriver.Chrome selenium object
         '''
-        _driver = webdriver.Chrome(options=self._build_options())
-        if headless:
-            _driver.headless = True
-        return _driver
+        return webdriver.Chrome(options=self._build_options())
