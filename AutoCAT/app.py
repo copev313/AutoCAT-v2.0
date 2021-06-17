@@ -1,8 +1,8 @@
-'''
+"""
 app.py
 ------
     Our entry point for getting our Gooey GUI initialized and running.
-'''
+"""
 import os
 import sys
 from time import time
@@ -16,61 +16,63 @@ from utils.helper_funcs import check_email
 from utils.webdriver import WebDriver
 
 
-@Gooey(program_name="AutoCAT: The Automation You Need For the Jobs You Don't!",
-       image_dir=".\images",
-       header_bg_color = "#828A9E",
-       body_bg_color = "#D3D5DB",
-       footer_bg_color = "#828A9E",
-       richtext_controls = True,
-       default_size=(550, 450),
-       required_cols=1)
+PROG_NAME = "AutoCAT: The Automation You Need For the Jobs You Don't!"
+PROG_DESC = "This program is intended to perform Boutsy category builds."
+BG_COLOR_1 = "#828A9E"
+BG_COLOR_2 = "#D3D5DB"
+
+
+@Gooey(
+    program_name=PROG_NAME,
+    image_dir=".\images",
+    header_bg_color=BG_COLOR_1,
+    body_bg_color=BG_COLOR_2,
+    footer_bg_color=BG_COLOR_1,
+    richtext_controls=True,
+    default_size=(550, 450),
+    required_cols=1,
+)
 def goopy():
-    '''
+    """
     The main function responsible for parsing our arguments and building our
     Gooey GUI.
-    '''
-    parser = GooeyParser(
-        prog="AutoCAT",
-        description="\nThis program is intended to perform Boutsy category builds.")
+    """
+    parser = GooeyParser(prog="AutoCAT", description="\n" + PROG_DESC)
 
     # Vendor Email field:
     parser.add_argument(
-        "Vendor",
-        action="store",
-        type=str,
-        help="Vendor's email address:",
+        "Vendor", action="store", type=str, help="Vendor's email address:"
     )
 
     parser.add_argument(
         "Process",
-        metavar = "Choose Process",
+        metavar="Choose Process",
         widget="Dropdown",
         choices=["Pre-Review", "Approval"],
-        gooey_options = {
-            'readonly': True,
-            'validator': {
-                'test': "user_input == 'Pre-Review' or user_input == 'Approval'" ,
-                'message': "Choose a process from the options"
-            }
-        }
+        gooey_options={
+            "readonly": True,
+            "validator": {
+                "test": "user_input == 'Pre-Review' or user_input == 'Approval'",
+                "message": "Choose a process from the options",
+            },
+        },
     )
 
     # Grab user's input:
     args = parser.parse_args()
 
-
-    ''' ***** WINDOW LOGIC *****'''
+    """ ***** WINDOW LOGIC *****"""
     print("\nLaunching . . .")
     vendor_email = args.Vendor
     selected_process = args.Process
 
     # Validation for Vendor Emails:
-    if not validators.email(vendor_email):
+    if (not validators.email(vendor_email)):
         print("Vendor field may only contain email addresses!")
         raise ValueError
 
     # [CASE] Run 'Pre-Review' Process:
-    if (selected_process == 'Pre-Review'):
+    if (selected_process == "Pre-Review"):
 
         # Initialize our WebDriver + Procedures classes:
         driver = WebDriver().initialize_driver()
@@ -92,24 +94,25 @@ def goopy():
         pr_procedure.launch_vendor_website()
 
     # [CASE] Run 'Approval' Process:
-    elif (selected_process == 'Approval'):
-
+    elif (selected_process == "Approval"):
+        pass
         # Initialize our WebDriver + Procedures classes:
-        #driver = WebDriver().initialize_driver()
-        #appr_procedure = approval.ApprovalProcess(driver)
-
+        # driver = WebDriver().initialize_driver()
+        # appr_procedure = approval.ApprovalProcess(driver, vendor_email)
 
     else:
         raise ValueError("Somehow an invalid process option was selected!")
 
 
 # Run Gooey Program:
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     try:
         start = time()
         goopy()
-        print(f"\n ----- Completed in { round(time() - start, 3) } seconds total. -----")
+        print(
+            f"\n ----- Completed in { round(time() - start, 3) } seconds total. -----"
+        )
 
     except KeyboardInterrupt:
         print("CANCELLED!")
