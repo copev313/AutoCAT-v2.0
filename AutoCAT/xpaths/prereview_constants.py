@@ -1,5 +1,5 @@
 '''
-xpaths.py
+prereview_constants.py
 ---------
   Storage for our xpaths required to target specific site elements.
 '''
@@ -40,6 +40,9 @@ account_details_tab = {
 
   "COMPANY_NAME_FIELD":
     "//input[@id='taxid']",
+  
+  "AD_UPDATE_BUTTON":
+    "//button[@type='submit']",
 }
 
 company_address_tab = {
@@ -57,6 +60,9 @@ company_address_tab = {
 
   "CITY_FIELD":
     "//*[@id='location-city']",
+    
+  "CA_SUBMIT_BUTTON":
+    "//button[@type='submit']"
 }
 
 company_details_tab = {
@@ -71,6 +77,9 @@ company_details_tab = {
 
   "INSTAGRAM_FIELD":
     "//*[@id='companyfield-33']",
+  
+  "CD_UPDATE_BUTTON":
+    "//button[@type='submit']",
 }
 
 ''' ***** DEFINE CONSTANTS ***** '''
@@ -84,11 +93,11 @@ SEARCH_IN_BUTTON        = backend_login_portal["SEARCH_IN_BUTTON"]
 # Vendor Email Search
 SEARCH_IN_USERS_DD      = backend_vendor_search["SEARCH_IN_USERS_DD"]
 SEARCH_BAR_FIELD        = backend_vendor_search["SEARCH_BAR_FIELD"]
-COMPANY_DETAILS_TAB     = backend_vendor_search["COMPANY_DETAILS_TAB"]
 
 # Account Details Tab:
 VENDOR_HEADER           = account_details_tab["VENDOR_HEADER"]
 COMPANY_NAME_FIELD      = account_details_tab["COMPANY_NAME_FIELD"]
+AD_UPDATE_BUTTON        = account_details_tab["AD_UPDATE_BUTTON"]
 
 # Company Address Tab:
 QUESTIONS_EMAIL_FIELD   = company_address_tab["QUESTIONS_EMAIL_FIELD"]
@@ -96,9 +105,11 @@ COUNTRY_DD              = company_address_tab["COUNTRY_DD"]
 STATE_AS_DD             = company_address_tab["STATE_AS_DD"]
 STATE_AS_FIELD          = company_address_tab["STATE_AS_FIELD"]
 CITY_FIELD              = company_address_tab["CITY_FIELD"]
+CA_SUBMIT_BUTTON        = company_address_tab["CA_SUBMIT_BUTTON"]
 
 # Company Details Tab:
 LOCATION_FIELD          = company_details_tab["LOCATION_FIELD"]
 WEBSITE_FIELD           = company_details_tab["WEBSITE_FIELD"]
 COMPANY_DESC_FIELD      = company_details_tab["COMPANY_DESC_FIELD"]
 INSTAGRAM_FIELD         = company_details_tab["INSTAGRAM_FIELD"]
+CD_UPDATE_BUTTON        = company_details_tab["CD_UPDATE_BUTTON"]
