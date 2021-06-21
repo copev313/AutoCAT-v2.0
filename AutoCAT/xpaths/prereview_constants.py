@@ -29,9 +29,6 @@ backend_vendor_search = {
   "SEARCH_BAR_FIELD":
     __SEARCH_IN_ROOT + "/input",
 
-  # may not need this xpath/element
-  "COMPANY_DETAILS_TAB":
-    "//div[@id='main']/div[1]/div/div[1]/ul/li[3]/a",
 }
 
 account_details_tab = {

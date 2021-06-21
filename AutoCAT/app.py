@@ -18,8 +18,8 @@ from utils.webdriver import WebDriver
 
 PROG_NAME = "AutoCAT: The Automation You Need For the Jobs You Don't!"
 PROG_DESC = "This program is intended to perform Boutsy category builds."
-BG_COLOR_1 = "#828A9E"
-BG_COLOR_2 = "#D3D5DB"
+BG_COLOR_1 = "#B5BBC9"
+BG_COLOR_2 = "#E3E4E6"
 
 
 @Gooey(
@@ -62,7 +62,7 @@ def goopy():
     args = parser.parse_args()
 
     """ ***** WINDOW LOGIC *****"""
-    print("\nLaunching . . .")
+    
     vendor_email = args.Vendor
     selected_process = args.Process
 
@@ -73,32 +73,48 @@ def goopy():
 
     # [CASE] Run 'Pre-Review' Process:
     if (selected_process == "Pre-Review"):
+        print("\nLaunching Pre-Review Process . . .")
 
         # Initialize our WebDriver + Procedures classes:
         driver = WebDriver().initialize_driver()
-        pr_procedure = prereview.PreReviewProcess(driver)
+        procedure = prereview.PreReviewProcess(driver)
 
         # Log into backend as admin:
-        pr_procedure.backend_admin_login()
+        procedure.backend_admin_login()
         # Search for the Vendor's vendor page by email:
-        pr_procedure.vendor_email_search(vendor_email)
+        procedure.vendor_email_search(vendor_email)
 
         # "ACCOUNT DETAILS" TAB -->
-        pr_procedure.complete_account_details_tab()
+        procedure.complete_account_details_tab()
         # "COMPANY ADDRESS" TAB -->
-        pr_procedure.complete_company_address_tab()
+        procedure.complete_company_address_tab()
         # "COMPANY DETAILS" TAB -->
-        pr_procedure.complete_company_details_tab()
+        procedure.complete_company_details_tab()
 
         # Open Vendor's Site in New Tab:
-        pr_procedure.launch_vendor_website()
+        procedure.launch_vendor_website()
 
     # [CASE] Run 'Approval' Process:
     elif (selected_process == "Approval"):
-        pass
+        print("\nLaunching Approval Process . . .")
+
         # Initialize our WebDriver + Procedures classes:
-        # driver = WebDriver().initialize_driver()
-        # appr_procedure = approval.ApprovalProcess(driver, vendor_email)
+        driver = WebDriver().initialize_driver()
+        procedure = approval.ApprovalProcess(driver, vendor_email)
+
+        # Log into backend as admin:
+        procedure.backend_admin_login()
+        # Search for the Vendor's vendor page by email:
+        procedure.vendor_email_search()
+        
+        # Store information from the vendor's page:
+        procedure.store_category_info()
+        # Complete the Coming Soon page:
+        procedure.complete_coming_soon_page()
+        # Complete the category page:
+        procedure.complete_category_page()
+        # Finished the vendor's page:
+        
 
     else:
         raise ValueError("Somehow an invalid process option was selected!")

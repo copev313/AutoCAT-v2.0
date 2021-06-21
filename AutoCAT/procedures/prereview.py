@@ -261,9 +261,6 @@ class PreReviewProcess:
             # [CHECK] Does the value in the 'Company name' field match the brand name?
             assert brand_name == _company_name_field2.get_attribute('value')
 
-        except TimeoutError:
-            print("\nTIMEOUT ERROR: Couldn't confirm successful page save!")
-            _driver.quit()
         except AssertionError:
             print("\nASSERTION ERROR: Couldn't confirm field 'Company name'!")
             _driver.quit()
@@ -454,5 +451,3 @@ class PreReviewProcess:
             _driver.switch_to.window(_driver.window_handles[1])
             # Go to website:
             _driver.get(self._website_url)
-            # Wait a second:
-            sleep(1)
