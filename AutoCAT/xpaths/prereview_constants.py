@@ -4,33 +4,6 @@ prereview_constants.py
   Storage for our xpaths required to target specific site elements.
 '''
 
-__BACKEND_LOGIN_ROOT = "//form[@id='login_form']/table"
-__SEARCH_IN_ROOT = "//div[@id='header']/div[3]/div[1]/form/div"
-
-
-backend_login_portal = {
-  "EMAIL_INPUT_FIELD":
-    __BACKEND_LOGIN_ROOT + "/tbody[1]/tr[1]/td/input",
-
-  "PASSWORD_INPUT_FIELD":
-    __BACKEND_LOGIN_ROOT + "/tbody[1]/tr[2]/td/input",
-
-  "LOGIN_BUTTON":
-    __BACKEND_LOGIN_ROOT + "/tbody[2]/tr/td/button",
-
-  "SEARCH_IN_BUTTON":
-    __SEARCH_IN_ROOT + "/div[1]/button",
-}
-
-backend_vendor_search = {
-  "SEARCH_IN_USERS_DD":
-    __SEARCH_IN_ROOT + "/div/ul/li[2]/a",
-
-  "SEARCH_BAR_FIELD":
-    __SEARCH_IN_ROOT + "/input",
-
-}
-
 account_details_tab = {
   "VENDOR_HEADER":
     "//*[@id='breadcrumb']/ul/li/span",
@@ -80,16 +53,6 @@ company_details_tab = {
 }
 
 ''' ***** DEFINE CONSTANTS ***** '''
-
-# Backend Admin Login:
-EMAIL_INPUT_FIELD       = backend_login_portal["EMAIL_INPUT_FIELD"]
-PASSWORD_INPUT_FIELD    = backend_login_portal["PASSWORD_INPUT_FIELD"]
-LOGIN_BUTTON            = backend_login_portal["LOGIN_BUTTON"]
-SEARCH_IN_BUTTON        = backend_login_portal["SEARCH_IN_BUTTON"]
-
-# Vendor Email Search
-SEARCH_IN_USERS_DD      = backend_vendor_search["SEARCH_IN_USERS_DD"]
-SEARCH_BAR_FIELD        = backend_vendor_search["SEARCH_BAR_FIELD"]
 
 # Account Details Tab:
 VENDOR_HEADER           = account_details_tab["VENDOR_HEADER"]

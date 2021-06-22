@@ -60,4 +60,4 @@ FIRST_CAT_POS_INPUT     = coming_soon_page["FIRST_CAT_POS_INPUT"]
 # Category Page:
 HEADER_BRAND_NAME       = category_page["HEADER_BRAND_NAME"]
 DESC_FULLSCREEN_BUTTON  = category_page["DESC_FULLSCREEN_BUTTON"]
-FULLSCREEN_ALIGN_LEFT   = category_page[""] 
+FULLSCREEN_ALIGN_LEFT   = category_page["FULLSCREEN_ALIGN_LEFT"]
