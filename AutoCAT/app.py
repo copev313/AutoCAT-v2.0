@@ -10,8 +10,8 @@ from time import time
 import validators
 from gooey import Gooey, GooeyParser
 
-import procedures.prereview as prereview
-import procedures.approval as approval
+from procedures.approve_vendor import ApproveVendorProcess
+#import procedures.decline_vendor as DeclineVendorProcess
 from utils.helper_funcs import check_email
 from utils.webdriver import WebDriver
 
@@ -48,11 +48,11 @@ def goopy():
         "Process",
         metavar="Choose Process",
         widget="Dropdown",
-        choices=["Pre-Review", "Approval"],
+        choices=["Approved", "Declined"],
         gooey_options={
             "readonly": True,
             "validator": {
-                "test": "user_input == 'Pre-Review' or user_input == 'Approval'",
+                "test": "user_input == 'Approved' or user_input == 'Declined'",
                 "message": "Choose a process from the options",
             },
         },
@@ -62,59 +62,35 @@ def goopy():
     args = parser.parse_args()
 
     """ ***** WINDOW LOGIC *****"""
-    
-    vendor_email = args.Vendor
-    selected_process = args.Process
+    '''copev313@gmail.com'''
+    email_input = args.Vendor
+    process_input = args.Process
 
     # Validation for Vendor Emails:
-    if (not validators.email(vendor_email)):
+    if (not validators.email(email_input)):
         print("Vendor field may only contain email addresses!")
         raise ValueError
 
-    # [CASE] Run 'Pre-Review' Process:
-    if (selected_process == "Pre-Review"):
-        print("\nLaunching Pre-Review Process . . .")
-
-        # Initialize our WebDriver + Procedures classes:
-        driver = WebDriver().initialize_driver()
-        procedure = prereview.PreReviewProcess(driver)
-
-        # Log into backend as admin:
-        procedure.backend_admin_login()
-        # Search for the Vendor's vendor page by email:
-        procedure.vendor_email_search(vendor_email)
-
-        # "ACCOUNT DETAILS" TAB -->
-        procedure.complete_account_details_tab()
-        # "COMPANY ADDRESS" TAB -->
-        procedure.complete_company_address_tab()
-        # "COMPANY DETAILS" TAB -->
-        procedure.complete_company_details_tab()
-
-        # Open Vendor's Site in New Tab:
-        procedure.launch_vendor_website()
-
-    # [CASE] Run 'Approval' Process:
-    elif (selected_process == "Approval"):
+    if (process_input == "Approved"):
         print("\nLaunching Approval Process . . .")
 
         # Initialize our WebDriver + Procedures classes:
         driver = WebDriver().initialize_driver()
-        procedure = approval.ApprovalProcess(driver, vendor_email)
+        approve = ApproveVendorProcess(driver)
 
         # Log into backend as admin:
-        procedure.backend_admin_login()
-        # Search for the Vendor's vendor page by email:
-        procedure.vendor_email_search()
-        
-        # Store information from the vendor's page:
-        procedure.store_category_info()
-        # Complete the Coming Soon page:
-        procedure.complete_coming_soon_page()
-        # Complete the category page:
-        procedure.complete_category_page()
-        # Finished the vendor's page:
-        
+        approve.backend_admin_login()
+        # Search for the vendor page by email:
+        approve.vendor_email_search(email_input)
+        # Save company name field + hit 'Approve vendor' button:
+        approve.approve_vendor_button()
+        # Fill out the rest of the account info (copy/paste):
+        approve.complete_vendor_account()
+
+
+    elif (process_input == "Denied"):
+        print("\nLaunching Decline Process . . .")
+        print("\nCOMING SOON!")
 
     else:
         raise ValueError("Somehow an invalid process option was selected!")

@@ -4,17 +4,6 @@ prereview_constants.py
   Storage for our xpaths required to target specific site elements.
 '''
 
-account_details_tab = {
-  "VENDOR_HEADER":
-    "//*[@id='breadcrumb']/ul/li/span",
-
-  "COMPANY_NAME_FIELD":
-    "//input[@id='taxid']",
-  
-  "AD_UPDATE_BUTTON":
-    "//button[@type='submit']",
-}
-
 company_address_tab = {
   "QUESTIONS_EMAIL_FIELD":
     "//input[@id='product-questions-admin-email']",
@@ -53,11 +42,6 @@ company_details_tab = {
 }
 
 ''' ***** DEFINE CONSTANTS ***** '''
-
-# Account Details Tab:
-VENDOR_HEADER           = account_details_tab["VENDOR_HEADER"]
-COMPANY_NAME_FIELD      = account_details_tab["COMPANY_NAME_FIELD"]
-AD_UPDATE_BUTTON        = account_details_tab["AD_UPDATE_BUTTON"]
 
 # Company Address Tab:
 QUESTIONS_EMAIL_FIELD   = company_address_tab["QUESTIONS_EMAIL_FIELD"]

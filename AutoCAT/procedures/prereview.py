@@ -9,16 +9,6 @@ import os
 from time import sleep
 
 from xpaths.prereview_constants import (
-    # Backend Admin Login:
-    EMAIL_INPUT_FIELD,
-    PASSWORD_INPUT_FIELD,
-    LOGIN_BUTTON,
-    SEARCH_IN_BUTTON,
-
-    # Vendor Email Search:
-    SEARCH_IN_USERS_DD,
-    SEARCH_BAR_FIELD,
-
     # Account Details Tab:
     VENDOR_HEADER,
     COMPANY_NAME_FIELD,
@@ -63,16 +53,6 @@ class PreReviewProcess:
 
     Methods:
     -------
-        backend_admin_login():
-            Logs into the backend of the website.
-
-        vendor_email_search(email_address):
-            Looks up a vendor using their email address.
-
-        complete_account_details_tab():
-            Handles the tasks required on the Account Details tab of the
-            vendor's page.
-
         complete_company_address_tab():
             Completes the tasks required on the Company Address tab of the
             vendor's page.
@@ -98,178 +78,6 @@ class PreReviewProcess:
         self._company_city: str = ""
         self._website_url: str = ""
         self._instagram_handle: str = ""
-
-
-    @timer
-    def backend_admin_login(self) -> None:
-        '''The process required to log into the backend of the website.'''
-        print("\n⚙️  Backend Admin Login")
-        _driver = self._driver
-        # Load our environ. variables:
-        load_dotenv()
-
-        # Print Admin Login Info to Console (password censored):
-        print_admin_info()  # debugs!
-
-        # Open browser to the login portal:
-        _driver.get(os.environ.get("BACKEND_LOGIN_URL"))
-
-        # Grab the necessary web elements via xpaths:
-        _email_field = _driver.find_element_by_xpath(EMAIL_INPUT_FIELD)
-        _pswd_field = _driver.find_element_by_xpath(PASSWORD_INPUT_FIELD)
-        _login_btn = _driver.find_element_by_xpath(LOGIN_BUTTON)
-
-        # [CHECK] ADMIN_EMAIL environ. variable was found:
-        if os.environ.get("ADMIN_EMAIL"):
-            _email_field.send_keys(os.environ.get("ADMIN_EMAIL"))
-        else:
-            print("No environ variable 'ADMIN_EMAIL'! Exiting.")
-            return
-        # [CHECK] ADMIN_PASSWORD environ. variable was found:
-        if os.environ.get("ADMIN_PASSWORD"):
-            _pswd_field.send_keys(os.environ.get("ADMIN_PASSWORD"))
-        else:
-            print("No environ variable 'ADMIN_PASSWORD' Exiting.")
-            return
-
-        # Click Login Button:
-        _login_btn.click()
-
-        # Confirm that we successfully logged in:
-        try:
-            # [CHECK] The 'Search in' dropdown button is visible:
-            WebDriverWait(_driver, self.TIMEOUT).until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, SEARCH_IN_BUTTON)
-                )
-            )
-            # [CHECK] The current page is the backend landing page:
-            assert _driver.current_url == os.environ.get("BACKEND_LANDING_URL")
-
-        except TimeoutError:
-            print("\nTIMEOUT ERROR: Couldn't confirm successfully login!")
-            _driver.quit()
-            return
-        except AssertionError:
-            print("\nASSERTION ERROR: We didn't make the right turn!")
-            _driver.quit()
-            return
-
-
-    @timer
-    def vendor_email_search(self, email_address: str) -> None:
-        '''The process for looking up a vendor by email address with the
-        backend search engine.
-
-        Parameters
-        ----------
-            email_address : str
-                The vendor's email address.
-        '''
-        _driver = self._driver
-        print("\n🐱  Vendor Email Search")
-        
-        # [CHECK] Confirm the we're successfully logged in:
-        try:
-            WebDriverWait(_driver, self.TIMEOUT).until(
-                EC.element_to_be_clickable(
-                    (By.XPATH, SEARCH_IN_BUTTON)
-                )
-            )
-        except TimeoutError:
-            print("\nTIMEOUT ERROR: Couldn't confirm successfully login!")
-            _driver.quit()
-            return
-
-        # Select search bar and enter vendor's email address:
-        _search_bar = _driver.find_element_by_xpath(SEARCH_BAR_FIELD)
-        _search_bar.send_keys(email_address)
-
-        # Click 'Search in' button:
-        _searchin_btn = _driver.find_element_by_xpath(SEARCH_IN_BUTTON)
-        _searchin_btn.click()
-
-        # Choose to search in 'Users' from the dropdown menu:
-        _searchin_dd_opt = _driver.find_element_by_xpath(SEARCH_IN_USERS_DD)
-        _searchin_dd_opt.click()
-
-        # Selecting the Users option SHOULD automatically put the cursor back
-        #   into the search bar.
-        _search_bar.send_keys(Keys.RETURN)
-        
-        # [CHECK] Confirm that we successfully found the vendor's page:
-        try:
-            WebDriverWait(_driver, self.TIMEOUT).until(
-                EC.visibility_of_element_located(
-                    (By.XPATH, VENDOR_HEADER)
-                )
-            )
-        except TimeoutError:
-            print("\nTIMEOUT ERROR: Couldn't confirm the vendor page loaded!")
-            _driver.quit()
-            return
-
-
-    @timer
-    def complete_account_details_tab(self):
-        '''Copy and pastes the brand name into the 'Company name' field on the
-        Company Details tab.'''
-        print("\n🐱  Account Details Tab")
-        _driver = self._driver
-
-        # [CHECK] Confirm we successfully found the vendor page:
-        try:
-            WebDriverWait(_driver, self.TIMEOUT).until(
-                EC.presence_of_element_located(
-                    (By.XPATH, VENDOR_HEADER)
-                )
-            )
-        except TimeoutError:
-            print("\nTIMEOUT ERROR: Couldn't confirm the vendor page was found!")
-            _driver.quit()
-            return
-
-        # COPY the brand name:
-        _vendor_header = _driver.find_element_by_xpath(VENDOR_HEADER)
-        header_txt = _vendor_header.text
-        parsed_header = header_txt.split('(')
-        email_address = parsed_header[0].strip()
-        brand_name = parsed_header[1].replace(')', '').strip()
-        print(f"Brand Name: {brand_name}\nEmail Address: {email_address}")
-
-        # Save/Set the vendor's profile_id from the URL:
-        current_url = _driver.current_url
-        self._profile_id = current_url.split('=')[-1]
-
-        # PASTE the brand name:
-        _company_name_field = _driver.find_element_by_xpath(COMPANY_NAME_FIELD)
-        _company_name_field.clear()
-        _company_name_field.send_keys(brand_name)
-
-        # Submit:
-        sleep(1)
-        _company_name_field.send_keys(Keys.RETURN)
-        sleep(1)
-
-        # Wait for page to load after inputting data:
-        wait_for_save(_driver, AD_UPDATE_BUTTON)
-            
-        # [CHECK] Confirm we successfully saved changes:
-        try:
-            # Grab element again to avoid 'staleness' error:
-            _company_name_field2 = _driver.find_element_by_xpath(COMPANY_NAME_FIELD)
-            # [CHECK] Does the value in the 'Company name' field match the brand name?
-            assert brand_name == _company_name_field2.get_attribute('value')
-
-        except AssertionError:
-            print("\nASSERTION ERROR: Couldn't confirm field 'Company name'!")
-            _driver.quit()
-        except Exception as err:
-            print(f"\nERROR: Exception in 'copy_paste_brand_name'!\n{err}")
-            _driver.quit()
-
-        # Store the vendor's email address from the Vendor's page (lowercase):
-        self._vendor_email_address = email_address.lower()
 
 
     @timer
@@ -340,7 +148,7 @@ class PreReviewProcess:
 
     @timer
     def complete_company_details_tab(self):
-        '''Overwrites the inforamtion in the 'Location' field with the
+        '''Overwrites the information in the 'Location' field with the
         appropriately formatted location.
 
         Prints the 'Instagram Handle' field.
