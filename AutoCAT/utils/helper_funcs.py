@@ -8,6 +8,9 @@ import re
 import time
 
 from dotenv import load_dotenv
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support.expected_conditions import visibility_of_element_located
+from selenium.webdriver.common.by import By
 
 
 def timer(func):
@@ -38,7 +41,7 @@ def check_email(email_address: str) -> bool:
     return True if re.search(regex, email_address) else False
 
 
-def element_has_class(element_obj, class_name: str) -> bool:
+def _element_has_class(element_obj, class_name: str) -> bool:
     '''Returns a boolean of whether a web element contains a specific class name.'''
     classes = element_obj.get_attribute('class')
     for cl in classes.split(' '):
@@ -54,7 +57,7 @@ def wait_for_save(driver, xpath: str, cls_name: str = 'disabled') -> None:
     # Wait for the element to have the class 'classy':
     _d = driver
     elem = _d.find_element_by_xpath(xpath)
-    classy = element_has_class(elem, cls_name)
+    classy = _element_has_class(elem, cls_name)
     # While the element doesn't have that class, pause then try again:
     while not classy:
         # Wait a sec:
@@ -62,6 +65,26 @@ def wait_for_save(driver, xpath: str, cls_name: str = 'disabled') -> None:
         elem = _d.find_element_by_xpath(xpath)
         classy = element_has_class(elem, cls_name)
     return None
+
+
+def check_condition(driver, xpath: str, timeout: int = 5) -> None:
+    '''Checks the visibility of a web element located at a given xpath. This
+    function can be used to confirm the correct webpage has been loaded.'''
+    _d = driver
+    try:
+        WebDriverWait(_d, timeout).until(
+            visibility_of_element_located(
+                (By.XPATH, xpath)
+            )
+        )
+    except TimeoutError:
+        print("\nTIMEOUT ERROR in check_condition!")
+        _driver.quit()
+        return
+    except Exception as err:
+        print(f"\nEXCEPTION OCCURED in check_condition: {err}")
+        _driver.quit()
+        return
 
 
 def _abbreviate_state(state: str) -> str:

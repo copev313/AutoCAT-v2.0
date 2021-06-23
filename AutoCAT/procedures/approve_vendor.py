@@ -19,13 +19,8 @@ from xpaths.approved_paths import (
     SEARCH_IN_USERS_DD,
     SEARCH_BAR_FIELD,
 
-    # Approve Vendor:
-    ACCOUNT_HEADER,
-    COMPANY_NAME_FIELD,
-    AD_UPDATE_BUTTON,
-    APPROVE_VENDOR_BUTTON,
-    
     # Complete Vendor Account:
+    ACCOUNT_HEADER,
     QUESTIONS_EMAIL_FIELD,
     COUNTRY_DD,
     STATE_AS_DD,
@@ -37,15 +32,25 @@ from xpaths.approved_paths import (
     LOCATION_FIELD,
     WEBSITE_FIELD,
     INSTAGRAM_FIELD,
+    COMPANY_DESC_FIELD,
     CD_UPDATE_BUTTON,
+    
+    # Complete Coming Soon Page:
+    NEW_CATEGORY_BUTTON,
+    NEW_CATEGORY_FIELD,
+    SAVE_CHANGES_BUTTON,
+    FIRST_POS_NAME,
+    FIRST_POS_DIV,
+    FIRST_CAT_POS_INPUT,
 )
 from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-#import validators
 from utils.helper_funcs import (
+    address_handler,
+    check_condition,
     timer,
     wait_for_save,
 )
@@ -74,6 +79,10 @@ class ApproveVendorProcess:
 
     # Wait time (in seconds) for WebDriverWait events:
     TIMEOUT = 5
+    
+    # References to the new tabs we will open:
+    ComingSoonWindow = None
+    CategoryWindow = None
 
 
     def __init__(self, driver):
@@ -123,23 +132,11 @@ class ApproveVendorProcess:
         # Click Login Button:
         _login_btn.click()
 
-        # Confirm that we successfully logged in:
-        try:
-            # [CHECK] The 'Search in' dropdown button is visible:
-            WebDriverWait(_driver, self.TIMEOUT).until(
-                EC.visibility_of_element_located((By.XPATH, SEARCH_IN_BUTTON))
-            )
-            # [CHECK] The current page is the backend landing page:
-            assert _driver.current_url == os.environ.get("BACKEND_LANDING_URL")
+        # [CHECK] Confirm that we successfully logged in:
+        check_condition(_driver, SEARCH_IN_BUTTON)
 
-        except TimeoutError:
-            print("\nTIMEOUT ERROR: Couldn't confirm successfully login!")
-            _driver.quit()
-            return
-        except AssertionError:
-            print("\nASSERTION ERROR: We didn't make the right turn!")
-            _driver.quit()
-            return
+        # [CHECK] The current page is the backend landing page:
+        assert _driver.current_url == os.environ.get("BACKEND_LANDING_URL")
 
 
     @timer
@@ -180,33 +177,18 @@ class ApproveVendorProcess:
         # Selecting the Users option SHOULD automatically put the cursor back
         #   into the search bar.
         _search_bar.send_keys(Keys.RETURN)
-        
-        # [CHECK] Confirm that we successfully found the vendor's page:
-        try:
-            WebDriverWait(_driver, self.TIMEOUT).until(
-                EC.visibility_of_element_located((By.XPATH, ACCOUNT_HEADER))
-            )
-        except TimeoutError:
-            print("\nTIMEOUT ERROR: Couldn't confirm the vendor page loaded!")
-            _driver.quit()
-            return
 
 
     @timer
-    def approve_vendor_button(self):
+    def complete_vendor_account(self) -> None:
         '''Run the routine for pressing the 'Approve Vendor' button.'''
-        print("\n✔️  Approved Vendor")
+        print("\n🐱  Complete Vendor Account")
         _driver = self._driver
         
-        # [CHECK] Confirm we successfully found the page:
-        try:
-            WebDriverWait(_driver, self.TIMEOUT).until(
-                EC.presence_of_element_located((By.XPATH, ACCOUNT_HEADER))
-            )
-        except TimeoutError:
-            print("\nTIMEOUT ERROR: Couldn't confirm the page was found!")
-            _driver.quit()
-            return
+        ''' * * * * * Grab Info from 'Account Details' tab * * * * * '''
+        
+        # [CHECK] Confirm we successfully loaded the page:
+        check_condition(_driver, ACCOUNT_HEADER)
         
         # Grab email and brand name from header:
         _header = _driver.find_element_by_xpath(ACCOUNT_HEADER)
@@ -220,44 +202,6 @@ class ApproveVendorProcess:
         self._vendor_email_address = email_address
         self._brand_name = brand_name
 
-        # Paste the brand name into the Company Name field:
-        _company_name_field = _driver.find_element_by_xpath(COMPANY_NAME_FIELD)
-        _company_name_field.clear()
-        _company_name_field.send_keys(brand_name)
-
-        # Submit:
-        sleep(1)
-        _company_name_field.send_keys(Keys.RETURN)
-        sleep(1)
-
-        # Wait for page to load after inputting data:
-        wait_for_save(_driver, AD_UPDATE_BUTTON)
-
-        # [CHECK] Confirm we successfully saved changes:
-        try:
-            # Grab element again to avoid 'staleness' error:
-            _name_field2 = _driver.find_element_by_xpath(COMPANY_NAME_FIELD)
-            # [CHECK] Does the value in the 'Company name' field match the brand name?
-            assert brand_name == _name_field2.get_attribute('value')
-
-        except AssertionError:
-            print("\nASSERTION ERROR: Couldn't confirm field 'Company name'!")
-            _driver.quit()
-        except Exception as err:
-            print(f"\nERROR: Exception in 'approve_vendor'!\n{err}")
-            _driver.quit()
-
-        _approve_btn = _driver.find_element_by_xpath(APPROVE_VENDOR_BUTTON)
-        _approve_btn.click()
-        sleep(1)
-
-
-    @timer
-    def complete_vendor_account(self):
-        '''Run the routine for pressing the 'Approve Vendor' button.'''
-        print("\n✔️  Complete Vendor Account")
-        _driver = self._driver
-
         ''' * * * * * Complete 'Company Address' tab * * * * * '''
 
         # Form the URL for the Company Address tab:
@@ -269,17 +213,9 @@ class ApproveVendorProcess:
         _driver.get(address_tab_url)
         
         # [CHECK] Confirm we successfully found our vendor page:
-        try:
-            WebDriverWait(_driver, self.TIMEOUT).until(
-                EC.presence_of_element_located((By.XPATH, QUESTIONS_EMAIL_FIELD))
-            )
-        except TimeoutError:
-            print("\nTIMEOUT ERROR: Couldn't confirm the company address tab \
-                was opened!")
-            _driver.quit()
-            return
+        check_condition(_driver, QUESTIONS_EMAIL_FIELD)
 
-        # Paste email address into 'Product questions e-mail' field:
+        # PASTE email address into 'Product questions e-mail' field:
         _email_field =  _driver.find_element_by_xpath(QUESTIONS_EMAIL_FIELD)
         _email_field.clear()
         _email_field.send_keys(self._vendor_email_address)
@@ -292,12 +228,12 @@ class ApproveVendorProcess:
         # Wait for page to indicate it successfully saved our input:
         wait_for_save(_driver, CA_SUBMIT_BUTTON)
 
-        # Handle the 'Country' dropdown:
+        # Copy value in the 'Country' dropdown:
         _country_dd = _driver.find_element_by_xpath(COUNTRY_DD)
         _country_selected = _country_dd.find_element_by_xpath("//*[@selected='selected']")
         self._company_country = _country_selected.text
 
-        # Handle the 'State' field:
+        # Copy value the 'State' field:
         # [CASE] Country is United States --> Use the dropdown XPATH:
         if (self._company_country == 'United States'):
             _state_dd = _driver.find_element_by_xpath(STATE_AS_DD)
@@ -309,7 +245,7 @@ class ApproveVendorProcess:
             _state_field = _driver.find_element_by_xpath(STATE_AS_FIELD)
             self._company_state = _state_field.get_attribute('value')
 
-        # Handle the 'City' field:
+        # Copy value in the 'City' field:
         _city_field = _driver.find_element_by_xpath(CITY_FIELD)
         self._company_city = _city_field.get_attribute('value')
         print("City: " + self._company_city)
@@ -317,9 +253,9 @@ class ApproveVendorProcess:
         print("Country: " + self._company_country)
 
 
-        ''' * * * * * Complete 'Company Address' tab * * * * * '''
+        ''' * * * * * Complete 'Company Details' tab * * * * * '''
 
-        # Form the URL for the Company Address tab:
+        # Form the URL for the Company Details tab:
         company_details_tab_url = "{root}?target=vendor&profile_id={id}".format(
                                     root=os.environ.get("BACKEND_LANDING_URL"),
                                     id=self._profile_id)
@@ -328,44 +264,38 @@ class ApproveVendorProcess:
         _driver.get(company_details_tab_url)
         
         # [CHECK] Next page successfully Loaded:
-        try:
-            WebDriverWait(_driver, self.TIMEOUT).until(
-                EC.presence_of_element_located((By.XPATH, LOCATION_FIELD))
-            )
-        except TimeoutError:
-            print("\nTIMEOUT ERROR: Couldn't confirm the company details tab \
-                was opened!")
-            _driver.quit()
-            return
+        check_condition(_driver, LOCATION_FIELD)
 
         # Handle the trusted dropdown:
         _trusted_dd = _driver.find_element_by_xpath(TRUSTED_DD)
-        _trusted_opt = _trusted_dd.find_element_by_xpath("/option[1]")
         _trusted_dd.click()
-        _trusted_opt.click()
+        _trusted_option = _trusted_dd.find_element_by_xpath("option[@value='1']")
+        _trusted_option.click()
 
         # Handle the location field:
         _location_field = _driver.find_element_by_xpath(LOCATION_FIELD)
-        location = address_handler(country=self._company_country,
-                                   state=self._company_state,
-                                   city=self._company_city)
+        location = address_handler(
+            country=self._company_country,
+            state=self._company_state,
+            city=self._company_city
+        )
         print("Address:  " + location)  # debugs!
         # Replace location imformation:
         _location_field.clear()
         _location_field.send_keys(location)
 
-        # Submit:
-        sleep(1)
-        _location_field.send_keys(Keys.RETURN)
-        sleep(1)
-
-        # Wait for the page to successfully save our location data:
-        wait_for_save(_driver, CD_UPDATE_BUTTON)
-
         # Store website URL so we can launch it later:
         _website_field = _driver.find_element_by_xpath(WEBSITE_FIELD)
         self._website_url =  _website_field.get_attribute('value')
         print(f"Site URL:  {self._website_url}")
+
+        # Copy description from 'Company Description':
+        _descr_field = _driver.find_element_by_xpath(COMPANY_DESC_FIELD)
+        self._company_description = _descr_field.text
+        _descr_field.click()
+        _descr_field.send_keys(Keys.CONTROL, 'a')
+        _descr_field.send_keys(Keys.CONTROL, 'c')
+        _descr_field.click()
 
         # Handle formatting & storing Instagram handle (if applicable):
         _instagram_field = _driver.find_element_by_xpath(INSTAGRAM_FIELD)
@@ -385,3 +315,91 @@ class ApproveVendorProcess:
 
         # Store the Instagram handle:
         self._instagram_handle = instagram if instagram else None
+        
+        # Submit:
+        sleep(1)
+        _instagram_field.send_keys(Keys.RETURN)
+        sleep(1)
+
+        # Wait for the page to successfully save our location data:
+        wait_for_save(_driver, CD_UPDATE_BUTTON)
+
+
+    @timer
+    def complete_coming_soon_page(self) -> None:
+        '''Executes the steps required to complete the Coming Soon page
+        portion of a category build.
+        '''
+        print("\n🐱  Complete Coming Soon Page")
+        _driver = self._driver
+
+        coming_soon_url = "{root}?target=categories&id=1845".format(
+                            root=os.environ.get("BACKEND_LANDING_URL"))
+
+        # Open a new tab to the 'Coming Soon' page:
+        _driver.execute_script("window.open('');")
+        ComingSoonWindow = _driver.window_handles[1]
+        _driver.switch_to.window(ComingSoonWindow)
+        _driver.get(coming_soon_url)
+
+        # [CHECK] Make sure new category button is loaded:
+        try:
+            WebDriverWait(_driver, self.TIMEOUT).until(
+                EC.element_to_be_clickable(
+                    (By.XPATH, NEW_CATEGORY_BUTTON))
+            )
+        except TimeoutError:
+            print("\nTIMEOUT ERROR: Couldn't find the NEW_CATEGORY_BUTTON element!")
+            _driver.quit()
+            return
+
+        # Click 'New category' button:
+        _new_cat_btn = _driver.find_element_by_xpath(NEW_CATEGORY_BUTTON)
+        _new_cat_btn.click()
+
+        # [CHECK] Make sure new category field is present:
+        check_condition(_driver, NEW_CATEGORY_FIELD)
+
+        # Enter brand name into new category field:
+        _new_cat_field = _driver.find_element_by_xpath(NEW_CATEGORY_FIELD)
+        _new_cat_field.send_keys(self._brand_name)
+
+        # Hit 'Save changes' button:
+        _save_btn = _driver.find_element_by_xpath(SAVE_CHANGES_BUTTON)
+        sleep(1)
+        _save_btn.click()
+        sleep(1)
+
+        # Wait for page to load after adding category:
+        wait_for_save(_driver, SAVE_CHANGES_BUTTON)
+
+        # [CHECK] Confirm element exists:
+        check_condition(_driver, FIRST_POS_NAME)
+        el = _driver.find_element_by_xpath(FIRST_POS_NAME)
+        assert el.get_attribute('title') == self._brand_name
+
+        _first_pos_bname = _driver.find_element_by_xpath(FIRST_POS_NAME)
+
+        # Form the URL to the category page:
+        link_href = _first_pos_bname.get_attribute('href')
+        splitted = link_href.split('=')
+        self._category_id = splitted[-1]
+        category_page_url = "{root}?target=category&id={cat_id}".format(
+                            root=os.environ.get("BACKEND_LANDING_URL"),
+                            cat_id=self._category_id)
+
+        # Change category position to 10,000.
+        _pos_div = _driver.find_element_by_xpath(FIRST_POS_DIV)
+        _pos_div.click()
+        sleep(1)
+        _pos_input = _driver.find_element_by_xpath(FIRST_CAT_POS_INPUT)
+        _pos_input.send_keys('10000')
+
+        # Save changes:
+        _save_btn = _driver.find_element_by_xpath(SAVE_CHANGES_BUTTON)
+        sleep(1)
+        _save_btn.click()
+        sleep(1)
+
+        # Wait for page to load after entering new position:
+        wait_for_save(_driver, SAVE_CHANGES_BUTTON)
