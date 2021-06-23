@@ -34,7 +34,7 @@ from xpaths.approved_paths import (
     INSTAGRAM_FIELD,
     COMPANY_DESC_FIELD,
     CD_UPDATE_BUTTON,
-    
+
     # Complete Coming Soon Page:
     NEW_CATEGORY_BUTTON,
     NEW_CATEGORY_FIELD,
@@ -42,6 +42,12 @@ from xpaths.approved_paths import (
     FIRST_POS_NAME,
     FIRST_POS_DIV,
     FIRST_CAT_POS_INPUT,
+
+    # Complete Category Page:
+    HEADER_BRAND_NAME,
+    CATEGORY_NAME_FIELD,
+    CLEAN_URL_FIELD,
+    SHOW_SEARCH_BOX_SWITCH,
 )
 from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
@@ -73,8 +79,15 @@ class ApproveVendorProcess:
         vendor_email_search(email):
             Looks up a vendor using their email address.
         
-        approve_vendor():
-            [...]
+        complete_vendor_account():
+            Executes the steps required to finish setting up a vendor's
+            account.
+
+        complete_coming_soon_page():
+            Completes the Coming Soon page portion of a category build.
+
+        complete_category_page():
+            Completes the category page.
     """
 
     # Wait time (in seconds) for WebDriverWait events:
@@ -181,7 +194,8 @@ class ApproveVendorProcess:
 
     @timer
     def complete_vendor_account(self) -> None:
-        '''Run the routine for pressing the 'Approve Vendor' button.'''
+        '''Executes the steps required to finish setting up a vendor's account
+        by completing / editting fields found in the different tabs.'''
         print("\n🐱  Complete Vendor Account")
         _driver = self._driver
         
@@ -327,10 +341,8 @@ class ApproveVendorProcess:
 
     @timer
     def complete_coming_soon_page(self) -> None:
-        '''Executes the steps required to complete the Coming Soon page
-        portion of a category build.
-        '''
-        print("\n🐱  Complete Coming Soon Page")
+        '''Completes the Coming Soon page portion of a category build.'''
+        print("\n🐱  Completing Coming Soon Page")
         _driver = self._driver
 
         coming_soon_url = "{root}?target=categories&id=1845".format(
@@ -380,18 +392,14 @@ class ApproveVendorProcess:
 
         _first_pos_bname = _driver.find_element_by_xpath(FIRST_POS_NAME)
 
-        # Form the URL to the category page:
+        # Store the category_id:
         link_href = _first_pos_bname.get_attribute('href')
         splitted = link_href.split('=')
         self._category_id = splitted[-1]
-        category_page_url = "{root}?target=category&id={cat_id}".format(
-                            root=os.environ.get("BACKEND_LANDING_URL"),
-                            cat_id=self._category_id)
 
         # Change category position to 10,000.
         _pos_div = _driver.find_element_by_xpath(FIRST_POS_DIV)
         _pos_div.click()
-        sleep(1)
         _pos_input = _driver.find_element_by_xpath(FIRST_CAT_POS_INPUT)
         _pos_input.send_keys('10000')
 
@@ -403,3 +411,46 @@ class ApproveVendorProcess:
 
         # Wait for page to load after entering new position:
         wait_for_save(_driver, SAVE_CHANGES_BUTTON)
+
+
+    def complete_category_page(self):
+        '''Completes the category page.'''
+        print("\n🐱  Completing Category Page")
+        _driver = self._driver
+
+        # Form the URL to the category page:
+        category_page_url = "{root}?target=category&id={cat_id}".format(
+                            root=os.environ.get("BACKEND_LANDING_URL"),
+                            cat_id=self._category_id)
+
+        # Open a new tab to the newly created category page:
+        _driver.execute_script("window.open('');")
+        CategoryWindow = _driver.window_handles[2]
+        _driver.switch_to.window(CategoryWindow)
+        _driver.get(category_page_url)
+
+        # [CHECK] Category Page Successfully Loaded:
+        check_condition(_driver, CLEAN_URL_FIELD)
+
+        # Complete the description field:
+        _name_field = _driver.find_element_by_xpath(CATEGORY_NAME_FIELD)
+        _name_field.click()
+        for _ in range(5):
+            _name_field.send_keys(Keys.TAB)
+            sleep(0.3)
+
+        '''
+        # Complete the Clean URL field:
+        _clean_url_field = _driver.find_element_by_xpath(CLEAN_URL_FIELD)
+        clean_value = _clean_url_field.get_attribute('value')
+
+        # [CASE] Current slug ends in '-' already:
+        if (clean_value[-1] == '-'):
+            clean_value = clean_value[ :-1]
+        new_val = f"{clean_value}-wholesale"
+        print(f"NEW URL SLUG: {new_val}")   # debugs!
+
+        _clean_url_field.clear()
+        _clean_url_field.send_keys(new_val)
+        '''
+

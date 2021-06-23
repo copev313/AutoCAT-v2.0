@@ -87,6 +87,8 @@ def goopy():
     approve.complete_vendor_account()
     # Complete Coming Soon Page:
     approve.complete_coming_soon_page()
+    # Complete the Category Page:
+    approve.complete_category_page()
 
 
 # Run Gooey Program:

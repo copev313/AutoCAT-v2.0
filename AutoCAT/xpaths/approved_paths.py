@@ -7,7 +7,7 @@ approved_paths.py
 __BACKEND_LOGIN_ROOT = "//form[@id='login_form']/table"
 __SEARCH_IN_ROOT = "//div[@id='header']/div[3]/div[1]/form/div"
 __COMING_SOON_ROOT = "/html/body/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/form"
-__DESCRIPTION_IFRAME = "/html/body/div[2]/div[2]/div[2]/div[1]/div/div[2]/form/div/fieldset/div/ul/li[6]/div[2]/div/div/div[1]/div/div[3]/iframe"
+__CATEGORY_ROOT = "/html/body/div[2]/div[2]/div[2]/div[1]/div/div[2]/form/div/fieldset/"
 
 
 login_portal = {
@@ -97,15 +97,15 @@ coming_soon_page = {
 category_page = {
   "HEADER_BRAND_NAME":
     "/html/body/div[2]/div[2]/div[2]/h1/div/ul/li[3]/span",
+  
+  "CATEGORY_NAME_FIELD":
+    "//*[@id='name']",
 
   "CLEAN_URL_FIELD":
     "//*[@id='cleanurl']",
-
-  "DESC_FULLSCREEN_BUTTON":
-    "//*[@id='fullscreen-1']",
-
-  "FULLSCREEN_ALIGN_LEFT":
-    "//*[@id='dropdown-menu-align-1']/div/div/ul/li[1]/a",
+  
+  "SHOW_SEARCH_BOX_SWITCH":
+    __CATEGORY_ROOT + "div/ul/li[18]/div[1]/label",
 
 }
 
@@ -147,4 +147,6 @@ FIRST_CAT_POS_INPUT     = coming_soon_page["FIRST_CAT_POS_INPUT"]
 
 # Category Page:
 HEADER_BRAND_NAME       = category_page["HEADER_BRAND_NAME"]
+CATEGORY_NAME_FIELD     = category_page["CATEGORY_NAME_FIELD"]
 CLEAN_URL_FIELD         = category_page["CLEAN_URL_FIELD"]
+SHOW_SEARCH_BOX_SWITCH  = category_page["SHOW_SEARCH_BOX_SWITCH"]
