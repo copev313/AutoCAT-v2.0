@@ -44,10 +44,12 @@ from xpaths.approved_paths import (
     FIRST_CAT_POS_INPUT,
 
     # Complete Category Page:
-    HEADER_BRAND_NAME,
-    CATEGORY_NAME_FIELD,
+    #HEADER_BRAND_NAME,
+    #CATEGORY_NAME_FIELD,
+    #DESCRIPTION_BOLD_BUTTON,
     CLEAN_URL_FIELD,
     SHOW_SEARCH_BOX_SWITCH,
+    #CATEGORY_UPDATE_BUTTON,
 )
 from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
@@ -57,6 +59,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from utils.helper_funcs import (
     address_handler,
     check_condition,
+    check_is_clickable,
+    format_instagram_handle,
     timer,
     wait_for_save,
 )
@@ -92,7 +96,9 @@ class ApproveVendorProcess:
 
     # Wait time (in seconds) for WebDriverWait events:
     TIMEOUT = 5
-    
+    # Time (in seconds) for the delay between submission events:
+    SUBMISSION_DELAY = 0.5
+
     # References to the new tabs we will open:
     ComingSoonWindow = None
     CategoryWindow = None
@@ -166,14 +172,7 @@ class ApproveVendorProcess:
         print("\n🐱  Vendor Email Search")
         
         # [CHECK] Confirm the we're successfully logged in:
-        try:
-            WebDriverWait(_driver, self.TIMEOUT).until(
-                EC.element_to_be_clickable((By.XPATH, SEARCH_IN_BUTTON))
-            )
-        except TimeoutError:
-            print("\nTIMEOUT ERROR: Couldn't confirm successfully login!")
-            _driver.quit()
-            return
+        check_is_clickable(_driver, SEARCH_IN_BUTTON)
 
         # Select search bar and enter vendor's email address:
         _search_bar = _driver.find_element_by_xpath(SEARCH_BAR_FIELD)
@@ -235,9 +234,9 @@ class ApproveVendorProcess:
         _email_field.send_keys(self._vendor_email_address)
 
         # Submit:
-        sleep(1)
+        sleep(self.SUBMISSION_DELAY)
         _email_field.send_keys(Keys.RETURN)
-        sleep(1)
+        sleep(self.SUBMISSION_DELAY)
 
         # Wait for page to indicate it successfully saved our input:
         wait_for_save(_driver, CA_SUBMIT_BUTTON)
@@ -306,34 +305,20 @@ class ApproveVendorProcess:
         # Copy description from 'Company Description':
         _descr_field = _driver.find_element_by_xpath(COMPANY_DESC_FIELD)
         self._company_description = _descr_field.text
-        _descr_field.click()
-        _descr_field.send_keys(Keys.CONTROL, 'a')
-        _descr_field.send_keys(Keys.CONTROL, 'c')
-        _descr_field.click()
 
         # Handle formatting & storing Instagram handle (if applicable):
         _instagram_field = _driver.find_element_by_xpath(INSTAGRAM_FIELD)
-        instagram = _instagram_field.get_attribute('value')
-        if instagram:
-            found_url = instagram.find('.com')
-            # [CASE] Contains '@' -> Removed @:
-            if '@' in instagram:
-                instagram = instagram.replace('@', '')
-            # [CASE] Is URL -> Strip to instagram handle only:
-            if (found_url != -1):
-                splitted = instagram.split('/')
-                instagram = splitted[-2] or splitted[-1]
-            print(f"Instagram:  {instagram}")
-        else:
-            print("Instagram:  None")
+        gram_val = _instagram_field.get_attribute('value')
+        instagram = format_instagram_handle(gram_val)
+        print(f"Instagram:  {instagram}")
 
         # Store the Instagram handle:
-        self._instagram_handle = instagram if instagram else None
-        
+        self._instagram_handle = instagram
+
         # Submit:
-        sleep(1)
+        sleep(self.SUBMISSION_DELAY)
         _instagram_field.send_keys(Keys.RETURN)
-        sleep(1)
+        sleep(self.SUBMISSION_DELAY)
 
         # Wait for the page to successfully save our location data:
         wait_for_save(_driver, CD_UPDATE_BUTTON)
@@ -355,15 +340,7 @@ class ApproveVendorProcess:
         _driver.get(coming_soon_url)
 
         # [CHECK] Make sure new category button is loaded:
-        try:
-            WebDriverWait(_driver, self.TIMEOUT).until(
-                EC.element_to_be_clickable(
-                    (By.XPATH, NEW_CATEGORY_BUTTON))
-            )
-        except TimeoutError:
-            print("\nTIMEOUT ERROR: Couldn't find the NEW_CATEGORY_BUTTON element!")
-            _driver.quit()
-            return
+        check_is_clickable(_driver, NEW_CATEGORY_BUTTON)
 
         # Click 'New category' button:
         _new_cat_btn = _driver.find_element_by_xpath(NEW_CATEGORY_BUTTON)
@@ -378,9 +355,9 @@ class ApproveVendorProcess:
 
         # Hit 'Save changes' button:
         _save_btn = _driver.find_element_by_xpath(SAVE_CHANGES_BUTTON)
-        sleep(1)
+        sleep(self.SUBMISSION_DELAY)
         _save_btn.click()
-        sleep(1)
+        sleep(self.SUBMISSION_DELAY)
 
         # Wait for page to load after adding category:
         wait_for_save(_driver, SAVE_CHANGES_BUTTON)
@@ -405,14 +382,15 @@ class ApproveVendorProcess:
 
         # Save changes:
         _save_btn = _driver.find_element_by_xpath(SAVE_CHANGES_BUTTON)
-        sleep(1)
+        sleep(self.SUBMISSION_DELAY)
         _save_btn.click()
-        sleep(1)
+        sleep(self.SUBMISSION_DELAY)
 
         # Wait for page to load after entering new position:
         wait_for_save(_driver, SAVE_CHANGES_BUTTON)
 
 
+    @timer
     def complete_category_page(self):
         '''Completes the category page.'''
         print("\n🐱  Completing Category Page")
@@ -432,15 +410,14 @@ class ApproveVendorProcess:
         # [CHECK] Category Page Successfully Loaded:
         check_condition(_driver, CLEAN_URL_FIELD)
 
-        # Complete the description field:
-        _name_field = _driver.find_element_by_xpath(CATEGORY_NAME_FIELD)
-        _name_field.click()
-        for _ in range(5):
-            _name_field.send_keys(Keys.TAB)
-            sleep(0.3)
-
         '''
-        # Complete the Clean URL field:
+        # (1) Fill in description:
+        print(f"\nDescription: {self._company_description}") "body > p"
+        desc_js = "let desc = document.querySelector('body').querySelector('p'); \
+                    desc.innerText = \'{}\';".format(self._company_description)
+        _driver.execute_script(desc_js)
+        '''
+        # (2) Complete the Clean URL field:
         _clean_url_field = _driver.find_element_by_xpath(CLEAN_URL_FIELD)
         clean_value = _clean_url_field.get_attribute('value')
 
@@ -452,5 +429,19 @@ class ApproveVendorProcess:
 
         _clean_url_field.clear()
         _clean_url_field.send_keys(new_val)
-        '''
 
+        # (3) Click 'Show search box' switch -> change to 'YES':
+        _show_search_switch = _driver.find_element_by_xpath(SHOW_SEARCH_BOX_SWITCH)
+        checked = _show_search_switch.get_attribute('checked')
+        # [CASE] 'Show search box' switch is not set to 'YES':
+        if not checked:
+            js_script = ("const switchElement = document.getElementById('showsearchbox'); " 
+                         "let checkedAttr = document.createAttribute('checked'); "
+                         "checkedAttr.value = 'checked'; "
+                         "switchElement.setAttributeNode(checkedAttr); ")
+            _driver.execute_script(js_script)
+            print("Checked 'Show search box' successfully! :)")
+        
+        _clean_url_field = _driver.find_element_by_xpath(CLEAN_URL_FIELD)
+        _clean_url_field.send_keys(Keys.RETURN)
+        sleep(1)

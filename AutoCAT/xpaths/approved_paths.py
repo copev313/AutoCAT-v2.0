@@ -101,11 +101,20 @@ category_page = {
   "CATEGORY_NAME_FIELD":
     "//*[@id='name']",
 
+  "DESCRIPTION_IFRAME":
+    __CATEGORY_ROOT + "div/ul/li[6]/div[2]/div/div/div[1]/div/div[3]/iframe",
+
+  "DESCRIPTION_BOLD_BUTTON":
+    "//*[@id='bold-1']",
+
   "CLEAN_URL_FIELD":
     "//*[@id='cleanurl']",
   
   "SHOW_SEARCH_BOX_SWITCH":
-    __CATEGORY_ROOT + "div/ul/li[18]/div[1]/label",
+    "//*[@id='showsearchbox']",
+  
+  "CATEGORY_UPDATE_BUTTON":
+    "/html/body/div[2]/div[2]/div[2]/div[1]/div/div[2]/form/div/div/div/div/button",
 
 }
 
@@ -148,5 +157,9 @@ FIRST_CAT_POS_INPUT     = coming_soon_page["FIRST_CAT_POS_INPUT"]
 # Category Page:
 HEADER_BRAND_NAME       = category_page["HEADER_BRAND_NAME"]
 CATEGORY_NAME_FIELD     = category_page["CATEGORY_NAME_FIELD"]
+DESCRIPTION_IFRAME      = category_page["DESCRIPTION_IFRAME"]
+
+DESCRIPTION_BOLD_BUTTON = category_page["DESCRIPTION_BOLD_BUTTON"]
 CLEAN_URL_FIELD         = category_page["CLEAN_URL_FIELD"]
 SHOW_SEARCH_BOX_SWITCH  = category_page["SHOW_SEARCH_BOX_SWITCH"]
+CATEGORY_UPDATE_BUTTON  = category_page["CATEGORY_UPDATE_BUTTON"]
