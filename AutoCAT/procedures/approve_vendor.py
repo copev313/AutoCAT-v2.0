@@ -49,13 +49,15 @@ from xpaths.approved_paths import (
     #DESCRIPTION_BOLD_BUTTON,
     CLEAN_URL_FIELD,
     SHOW_SEARCH_BOX_SWITCH,
-    #CATEGORY_UPDATE_BUTTON,
+    CATEGORY_UPDATE_BUTTON,
+
+    # Clean Up:
+    VENDOR_PAGE_URL_FIELD,
+    VENDOR_CATEGORIES_FIELD,
+    CATEGORY_INPUT_FIELD,
 )
 from dotenv import load_dotenv
-from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 from utils.helper_funcs import (
     address_handler,
     check_condition,
@@ -98,10 +100,6 @@ class ApproveVendorProcess:
     TIMEOUT = 5
     # Time (in seconds) for the delay between submission events:
     SUBMISSION_DELAY = 0.5
-
-    # References to the new tabs we will open:
-    ComingSoonWindow = None
-    CategoryWindow = None
 
 
     def __init__(self, driver):
@@ -335,8 +333,8 @@ class ApproveVendorProcess:
 
         # Open a new tab to the 'Coming Soon' page:
         _driver.execute_script("window.open('');")
-        ComingSoonWindow = _driver.window_handles[1]
-        _driver.switch_to.window(ComingSoonWindow)
+        coming_soon_window = _driver.window_handles[1]
+        _driver.switch_to.window(coming_soon_window)
         _driver.get(coming_soon_url)
 
         # [CHECK] Make sure new category button is loaded:
@@ -403,20 +401,16 @@ class ApproveVendorProcess:
 
         # Open a new tab to the newly created category page:
         _driver.execute_script("window.open('');")
-        CategoryWindow = _driver.window_handles[2]
-        _driver.switch_to.window(CategoryWindow)
+        category_window = _driver.window_handles[2]
+        _driver.switch_to.window(category_window)
         _driver.get(category_page_url)
 
         # [CHECK] Category Page Successfully Loaded:
         check_condition(_driver, CLEAN_URL_FIELD)
 
-        '''
-        # (1) Fill in description:
-        print(f"\nDescription: {self._company_description}") "body > p"
-        desc_js = "let desc = document.querySelector('body').querySelector('p'); \
-                    desc.innerText = \'{}\';".format(self._company_description)
-        _driver.execute_script(desc_js)
-        '''
+        # (1) Paste description into 'Description' iframe field:
+        # TODO...
+
         # (2) Complete the Clean URL field:
         _clean_url_field = _driver.find_element_by_xpath(CLEAN_URL_FIELD)
         clean_value = _clean_url_field.get_attribute('value')
@@ -441,7 +435,49 @@ class ApproveVendorProcess:
                          "switchElement.setAttributeNode(checkedAttr); ")
             _driver.execute_script(js_script)
             print("Checked 'Show search box' successfully! :)")
-        
+
         _clean_url_field = _driver.find_element_by_xpath(CLEAN_URL_FIELD)
+        sleep(self.SUBMISSION_DELAY)
         _clean_url_field.send_keys(Keys.RETURN)
+        sleep(self.SUBMISSION_DELAY)
+
+        # Wait for page to save:
+        wait_for_save(_driver, CATEGORY_UPDATE_BUTTON)
+
+
+    @timer
+    def clean_up(self):
+        '''Finishes the CAT build process & tears down any unnecessary
+        resources.
+        '''
+        print("\n🧼  Cleaning Up")
+        _driver = self._driver
+
+        # Close the Coming Soon window:
+        _driver.switch_to_window(_driver.window_handles[1])
+        sleep(self.SUBMISSION_DELAY)
+
+        _driver.close()
+        sleep(self.SUBMISSION_DELAY)
+
+
+        # [CHECK] Confirm element exists:
+        _driver.switch_to_window(_driver.window_handles[0])
+        sleep(self.SUBMISSION_DELAY)
+        check_condition(_driver, VENDOR_CATEGORIES_FIELD)
+
+        _vendor_cat_field = _driver.find_element_by_xpath(CATEGORY_INPUT_FIELD)
+        _vendor_cat_field.send_keys(self._brand_name)
+
         sleep(1)
+        _vendor_cat_field.send_keys(Keys.RETURN)
+        sleep(self.SUBMISSION_DELAY)
+
+        _vendor_url_field = _driver.find_element_by_xpath(VENDOR_PAGE_URL_FIELD)
+
+        sleep(self.SUBMISSION_DELAY)
+        _vendor_url_field.send_keys(Keys.RETURN)
+        sleep(self.SUBMISSION_DELAY)
+
+        # Wait for page to finish loading after saving changes:
+        wait_for_save(_driver, CD_UPDATE_BUTTON)

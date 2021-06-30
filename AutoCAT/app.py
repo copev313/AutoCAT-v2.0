@@ -89,6 +89,8 @@ def goopy():
     approve.complete_coming_soon_page()
     # Complete the Category Page:
     approve.complete_category_page()
+    # Clean up:
+    approve.clean_up()
 
 
 # Run Gooey Program:

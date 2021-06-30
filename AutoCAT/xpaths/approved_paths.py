@@ -115,6 +115,17 @@ category_page = {
   
   "CATEGORY_UPDATE_BUTTON":
     "/html/body/div[2]/div[2]/div[2]/div[1]/div/div[2]/form/div/div/div/div/button",
+}
+
+clean_up = {
+  "VENDOR_PAGE_URL_FIELD":
+    "//*[@id='vendorpageurl']",
+
+  "VENDOR_CATEGORIES_FIELD":
+    "//*[@id='categories']",
+
+  "CATEGORY_INPUT_FIELD":
+    "/html/body/div[2]/div[2]/div[2]/div[1]/div/div[2]/form/div/fieldset[1]/div/ul/li[8]/div[2]/div/span/span/span[1]/span/ul/li/input",
 
 }
 
@@ -163,3 +174,7 @@ DESCRIPTION_BOLD_BUTTON = category_page["DESCRIPTION_BOLD_BUTTON"]
 CLEAN_URL_FIELD         = category_page["CLEAN_URL_FIELD"]
 SHOW_SEARCH_BOX_SWITCH  = category_page["SHOW_SEARCH_BOX_SWITCH"]
 CATEGORY_UPDATE_BUTTON  = category_page["CATEGORY_UPDATE_BUTTON"]
+
+VENDOR_PAGE_URL_FIELD = clean_up["VENDOR_PAGE_URL_FIELD"]
+VENDOR_CATEGORIES_FIELD = clean_up["VENDOR_CATEGORIES_FIELD"]
+CATEGORY_INPUT_FIELD = clean_up["CATEGORY_INPUT_FIELD"]
