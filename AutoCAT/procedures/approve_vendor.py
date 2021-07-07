@@ -44,9 +44,7 @@ from xpaths.approved_paths import (
     FIRST_CAT_POS_INPUT,
 
     # Complete Category Page:
-    #HEADER_BRAND_NAME,
-    #CATEGORY_NAME_FIELD,
-    #DESCRIPTION_BOLD_BUTTON,
+    DESCRIPTION_TEXTAREA,
     CLEAN_URL_FIELD,
     SHOW_SEARCH_BOX_SWITCH,
     CATEGORY_UPDATE_BUTTON,
@@ -99,7 +97,7 @@ class ApproveVendorProcess:
     # Wait time (in seconds) for WebDriverWait events:
     TIMEOUT = 5
     # Time (in seconds) for the delay between submission events:
-    SUBMISSION_DELAY = 0.5
+    SUBMISSION_DELAY = 0.3
 
 
     def __init__(self, driver):
@@ -290,14 +288,18 @@ class ApproveVendorProcess:
             state=self._company_state,
             city=self._company_city
         )
-        print("Address:  " + location)  # debugs!
+        print("Location:  " + location)
         # Replace location imformation:
         _location_field.clear()
         _location_field.send_keys(location)
 
         # Store website URL so we can launch it later:
         _website_field = _driver.find_element_by_xpath(WEBSITE_FIELD)
-        self._website_url =  _website_field.get_attribute('value')
+        site =  _website_field.get_attribute('value')
+        # Force to lowercase:
+        self._website_url = site.lower()
+        _website_field.clear()
+        _website_field.send_keys(self._website_url)
         print(f"Site URL:  {self._website_url}")
 
         # Copy description from 'Company Description':
@@ -306,19 +308,14 @@ class ApproveVendorProcess:
 
         # Handle formatting & storing Instagram handle (if applicable):
         _instagram_field = _driver.find_element_by_xpath(INSTAGRAM_FIELD)
-        gram_val = _instagram_field.get_attribute('value')
-        instagram = format_instagram_handle(gram_val)
+        gram = _instagram_field.get_attribute('value')
+        instagram = format_instagram_handle(gram)
         print(f"Instagram:  {instagram}")
 
         # Store the Instagram handle:
         self._instagram_handle = instagram
 
-        # Submit:
-        sleep(self.SUBMISSION_DELAY)
-        _instagram_field.send_keys(Keys.RETURN)
-        sleep(self.SUBMISSION_DELAY)
-
-        # Wait for the page to successfully save our location data:
+        # Wait for the page to successfully save our location info:
         wait_for_save(_driver, CD_UPDATE_BUTTON)
 
 
@@ -408,8 +405,8 @@ class ApproveVendorProcess:
         # [CHECK] Category Page Successfully Loaded:
         check_condition(_driver, CLEAN_URL_FIELD)
 
-        # (1) Paste description into 'Description' iframe field:
-        # TODO...
+        # (1) Paste description into 'Description' textarea element:
+        # TODO
 
         # (2) Complete the Clean URL field:
         _clean_url_field = _driver.find_element_by_xpath(CLEAN_URL_FIELD)
@@ -419,7 +416,6 @@ class ApproveVendorProcess:
         if (clean_value[-1] == '-'):
             clean_value = clean_value[ :-1]
         new_val = f"{clean_value}-wholesale"
-        print(f"NEW URL SLUG: {new_val}")   # debugs!
 
         _clean_url_field.clear()
         _clean_url_field.send_keys(new_val)
@@ -434,7 +430,6 @@ class ApproveVendorProcess:
                          "checkedAttr.value = 'checked'; "
                          "switchElement.setAttributeNode(checkedAttr); ")
             _driver.execute_script(js_script)
-            print("Checked 'Show search box' successfully! :)")
 
         _clean_url_field = _driver.find_element_by_xpath(CLEAN_URL_FIELD)
         sleep(self.SUBMISSION_DELAY)

@@ -95,17 +95,8 @@ coming_soon_page = {
 }
 
 category_page = {
-  "HEADER_BRAND_NAME":
-    "/html/body/div[2]/div[2]/div[2]/h1/div/ul/li[3]/span",
-  
-  "CATEGORY_NAME_FIELD":
-    "//*[@id='name']",
-
-  "DESCRIPTION_IFRAME":
-    __CATEGORY_ROOT + "div/ul/li[6]/div[2]/div/div/div[1]/div/div[3]/iframe",
-
-  "DESCRIPTION_BOLD_BUTTON":
-    "//*[@id='bold-1']",
+  "DESCRIPTION_TEXTAREA":
+    "//*[@id='description']",
 
   "CLEAN_URL_FIELD":
     "//*[@id='cleanurl']",
@@ -166,15 +157,12 @@ FIRST_POS_DIV           = coming_soon_page["FIRST_POS_DIV"]
 FIRST_CAT_POS_INPUT     = coming_soon_page["FIRST_CAT_POS_INPUT"]
 
 # Category Page:
-HEADER_BRAND_NAME       = category_page["HEADER_BRAND_NAME"]
-CATEGORY_NAME_FIELD     = category_page["CATEGORY_NAME_FIELD"]
-DESCRIPTION_IFRAME      = category_page["DESCRIPTION_IFRAME"]
+DESCRIPTION_TEXTAREA      = category_page["DESCRIPTION_TEXTAREA"]
+CLEAN_URL_FIELD           = category_page["CLEAN_URL_FIELD"]
+SHOW_SEARCH_BOX_SWITCH    = category_page["SHOW_SEARCH_BOX_SWITCH"]
+CATEGORY_UPDATE_BUTTON    = category_page["CATEGORY_UPDATE_BUTTON"]
 
-DESCRIPTION_BOLD_BUTTON = category_page["DESCRIPTION_BOLD_BUTTON"]
-CLEAN_URL_FIELD         = category_page["CLEAN_URL_FIELD"]
-SHOW_SEARCH_BOX_SWITCH  = category_page["SHOW_SEARCH_BOX_SWITCH"]
-CATEGORY_UPDATE_BUTTON  = category_page["CATEGORY_UPDATE_BUTTON"]
-
-VENDOR_PAGE_URL_FIELD = clean_up["VENDOR_PAGE_URL_FIELD"]
+# Clean Up:
+VENDOR_PAGE_URL_FIELD   = clean_up["VENDOR_PAGE_URL_FIELD"]
 VENDOR_CATEGORIES_FIELD = clean_up["VENDOR_CATEGORIES_FIELD"]
-CATEGORY_INPUT_FIELD = clean_up["CATEGORY_INPUT_FIELD"]
+CATEGORY_INPUT_FIELD    = clean_up["CATEGORY_INPUT_FIELD"]

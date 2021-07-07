@@ -47,8 +47,8 @@ def check_email(email_address: str) -> bool:
 def _element_has_class(element_obj, class_name: str) -> bool:
     '''Returns a boolean of whether a web element contains a specific class name.'''
     classes = element_obj.get_attribute('class')
-    for cl in classes.split(' '):
-        if (cl == class_name):
+    for cls in classes.split(' '):
+        if (cls == class_name):
             return True
     return False
 
@@ -66,16 +66,16 @@ def wait_for_save(driver, xpath: str, cls_name: str = 'disabled') -> None:
         # Wait a sec:
         time.sleep(1)
         elem = _d.find_element_by_xpath(xpath)
-        classy = element_has_class(elem, cls_name)
+        classy = _element_has_class(elem, cls_name)
     return None
 
 
 def check_condition(driver, xpath: str, timeout: int = 5) -> None:
     '''Checks the visibility of a web element located at a given xpath. This
     function can be used to confirm the correct webpage has been loaded.'''
-    _d = driver
+    _driver = driver
     try:
-        WebDriverWait(_d, timeout).until(
+        WebDriverWait(_driver, timeout).until(
             visibility_of_element_located(
                 (By.XPATH, xpath)
             )
@@ -92,9 +92,9 @@ def check_condition(driver, xpath: str, timeout: int = 5) -> None:
 
 def check_is_clickable(driver, xpath: str, timeout: int = 5) -> None:
     '''Checks if a web element is clickable at a given xpath.'''
-    _d = driver
+    _driver = driver
     try:
-        WebDriverWait(_d, timeout).until(
+        WebDriverWait(_driver, timeout).until(
             element_to_be_clickable(
                 (By.XPATH, xpath)
             )
@@ -189,22 +189,21 @@ def address_handler(country: str = '', state: str = '', city: str ='') -> str:
         return f"{city}, {state_abbr}"
 
     # [CASE] Country other than US:
-    state = state.title()
-    return f"{state}, {country}"
-
-
-def format_instagram_handle(handle: str = ''):
-    if handle:
-        # [CASE] Found a URL -> Strip to instagram handle only:
-        url_check = handle.find('.com')
-        if (url_check != -1):
-            splitted = handle.split('/')
-            handle = splitted[-2] or splitted[-1]
-
-        # [CASE] Contain '@' -> Remove @:
-        elif('@' in handle):
-            handle = handle.replace('@', '')
-        return handle
-
     else:
-        return None
+        if state:
+            state = state.title()
+            return f"{state}, {country}"
+        elif city:
+            return f"{city}, {country}"
+        else:
+            return country
+
+
+def format_instagram_handle(handle: str):
+    if handle:
+        # [CASE] Contains '@' -> Remove @:
+        if('@' in handle):
+            handle = handle.replace('@', '')
+        return handle.lower()
+
+    return None
