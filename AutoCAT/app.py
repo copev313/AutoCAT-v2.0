@@ -32,47 +32,25 @@ BG_COLOR_2 = "#E3E4E6"
     required_cols=1,
 )
 def goopy():
-    """
-    The main function responsible for parsing our arguments and building our
+    """The main function responsible for parsing our arguments and building our
     Gooey GUI.
     """
-    parser = GooeyParser(prog="AutoCAT", description="\n" + PROG_DESC)
+    parser = GooeyParser(prog="AutoCAT", description=f"\n{PROG_DESC}")
 
     # Vendor Email field:
     parser.add_argument(
         "Vendor", action="store", type=str, help="Vendor's email address:"
     )
 
-    '''
-    parser.add_argument(
-        "Process",
-        metavar="Choose Process",
-        widget="Dropdown",
-        choices=["Approved", "Declined"],
-        gooey_options={
-            "readonly": True,
-            "validator": {
-                "test": "user_input == 'Approved' or user_input == 'Declined'",
-                "message": "Choose a process from the options",
-            },
-        },
-    )
-    '''
-
     # Grab user's input:
     args = parser.parse_args()
-
-    """ ***** WINDOW LOGIC *****"""
-    '''copev313@gmail.com'''
     email_input = args.Vendor
-    #process_input = args.Process
 
     # Validation for Vendor Emails:
     if (not validators.email(email_input)):
         print("Vendor field may only contain email addresses!")
         raise ValueError
 
-    
     print("\nLaunching Approval Process . . .")
 
     # Initialize our WebDriver + Procedures classes:

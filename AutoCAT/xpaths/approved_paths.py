@@ -7,7 +7,6 @@ approved_paths.py
 __BACKEND_LOGIN_ROOT = "//form[@id='login_form']/table"
 __SEARCH_IN_ROOT = "//div[@id='header']/div[3]/div[1]/form/div"
 __COMING_SOON_ROOT = "/html/body/div[2]/div[2]/div[2]/div[1]/div/div[2]/div/form"
-__CATEGORY_ROOT = "/html/body/div[2]/div[2]/div[2]/div[1]/div/div[2]/form/div/fieldset/"
 
 
 login_portal = {
@@ -53,7 +52,6 @@ complete_vendor_account = {
 
   "CA_SUBMIT_BUTTON":
     "//button[@type='submit']",
-
 
   "TRUSTED_DD":
     "//*[@id='istrustedvendor']",
@@ -117,10 +115,8 @@ clean_up = {
 
   "CATEGORY_INPUT_FIELD":
     "/html/body/div[2]/div[2]/div[2]/div[1]/div/div[2]/form/div/fieldset[1]/div/ul/li[8]/div[2]/div/span/span/span[1]/span/ul/li/input",
-
 }
 
-''' ***** DEFINE CONSTANTS ***** '''
 
 # Backend Admin Login:
 EMAIL_INPUT_FIELD       = login_portal["EMAIL_INPUT_FIELD"]
