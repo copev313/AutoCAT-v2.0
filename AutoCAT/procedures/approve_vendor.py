@@ -20,7 +20,7 @@ from xpaths.approved_paths import (
     STATE_AS_FIELD, CITY_FIELD, CA_SUBMIT_BUTTON,
 
     TRUSTED_DD, LOCATION_FIELD, WEBSITE_FIELD, INSTAGRAM_FIELD,
-    COMPANY_DESC_FIELD, CD_UPDATE_BUTTON,
+    MINIMUM_ORDER_DD, COMPANY_DESC_FIELD, CD_UPDATE_BUTTON,
 
     # Complete Coming Soon Page:
     NEW_CATEGORY_BUTTON, NEW_CATEGORY_FIELD, SAVE_CHANGES_BUTTON,
@@ -40,6 +40,7 @@ from utils.helper_funcs import (
     check_condition,
     check_is_clickable,
     format_instagram_handle,
+    minimum_order_amount_handler,
     timer,
     wait_for_save,
 )
@@ -93,6 +94,7 @@ class ApproveVendorProcess:
         self._company_city: str = ""
         self._website_url: str = ""
         self._instagram_handle: str = ""
+        self._minimum_order_amount: str = ""
         self._company_description: str = ""
         self._category_id: str = ""
 
@@ -311,7 +313,7 @@ class ApproveVendorProcess:
         _update_btn = _driver.find_element_by_xpath(CD_UPDATE_BUTTON)
         _update_btn.click()
         sleep(self.SUBMISSION_DELAY)
-        
+
         # Wait for the page to successfully save our info:
         wait_for_save(_driver, CD_UPDATE_BUTTON)
 
@@ -427,11 +429,12 @@ class ApproveVendorProcess:
         # [CASE] 'Show search box' switch is not set to 'YES':
         if not checked:
             js_script = """
-            const switchElement = document.getElementById('showsearchbox'); 
-            let checkedAttr = document.createAttribute('checked'); 
-            checkedAttr.value = 'checked'; 
-            "switchElement.setAttributeNode(checkedAttr);
+                const switchElement = document.getElementById('showsearchbox'); 
+                let checkedAttr = document.createAttribute('checked'); 
+                checkedAttr.value = 'checked'; 
+                switchElement.setAttributeNode(checkedAttr);
             """
+
             _driver.execute_script(js_script)
 
         _clean_url_field = _driver.find_element_by_xpath(CLEAN_URL_FIELD)

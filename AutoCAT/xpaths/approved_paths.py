@@ -68,6 +68,9 @@ complete_vendor_account = {
   "INSTAGRAM_FIELD":
     "//*[@id='companyfield-33']",
 
+  "MINIMUM_ORDER_DD":
+    "//*[@id='companyfield-29']",
+
   "CD_UPDATE_BUTTON":
     "//button[@type='submit']",
 }
@@ -142,6 +145,7 @@ LOCATION_FIELD          = complete_vendor_account["LOCATION_FIELD"]
 WEBSITE_FIELD           = complete_vendor_account["WEBSITE_FIELD"]
 COMPANY_DESC_FIELD      = complete_vendor_account["COMPANY_DESC_FIELD"]
 INSTAGRAM_FIELD         = complete_vendor_account["INSTAGRAM_FIELD"]
+MINIMUM_ORDER_DD        = complete_vendor_account["MINIMUM_ORDER_DD"]
 CD_UPDATE_BUTTON        = complete_vendor_account["CD_UPDATE_BUTTON"]
 
 # Coming Soon Page:
