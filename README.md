@@ -1,19 +1,25 @@
 # AutoCAT v2.0 (Selenium Category Build Automation)
  The automation you need for the jobs your don't! This is an automated workflow project for a simple task that I'm tired of doing manually.
 
-### Setup:
+## Setup:
 
  - Inside the repo folder create your virtual environment:
 
     ```python -m venv env```
 
+ - Activate the virtual environment:
+
+    ```cd env\scripts```
+
+    ```activate```
+
  - Download the required dependencies:
 
     ```pip install -r requirements.txt```
 
- - Copy 'chromedriver.exe' into the 'env\Scripts' folder. Please see the [current releases](https://chromedriver.chromium.org/downloads) for the latest stable version of the Google Chrome webdriver.
+ - Copy 'chromedriver.exe' into the 'env\Scripts' folder. Please see the [current releases](https://chromedriver.chromium.org/downloads) for the latest stable version of the Google Chrome webdriver. Remember that in some cases you may need to download the latest version of the driver for the program to run properly.
 
- - A .env file is required in the repo folder for the program to run properly. The necessary variables are included in the block below, simply copy/paste.
+ - A .env file is required in the repo folder for the program to log into the website. The necessary variables are included in the block below, simply copy/paste, inserting the corresponding values for your account.
 
     ```
     ADMIN_EMAIL=
@@ -22,3 +28,13 @@
     BACKEND_LOGIN_URL=
     BACKEND_LANDING_URL=
     ```
+
+## Usage:
+ - To run the program, simply run the following command from the 'AutoCAT' folder:
+
+    ```python app.py```
+
+ - Enter the email address for the vendor you wish to build a category for. Upon submission, the program will automatically run through the process of creating the category for you.
+ (It currently needs little to no intervention, but a human eye is recommended to ensure that the category is created properly.)
+
+ - NOTE: The company description will still need copy/pasted into the category description field.
