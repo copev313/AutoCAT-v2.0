@@ -69,6 +69,8 @@ def goopy():
     approve.complete_category_page()
     # Clean up:
     approve.clean_up()
+    # Add Vendor Stats to MongoDB:
+    approve.save_stats_to_db()
 
 
 # Run Gooey Program:
