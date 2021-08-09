@@ -43,8 +43,8 @@
 
 Given that this program is very task specific and requires admin credentials to run through the process, checkout the videos below to see it in action!
 
-![Video 1](https://user-images.githubusercontent.com/59665246/128732593-367dc9b8-65a9-4866-886e-791e21b57278.mp4)
+https://user-images.githubusercontent.com/59665246/128732593-367dc9b8-65a9-4866-886e-791e21b57278.mp4
 
-![Video 2](https://user-images.githubusercontent.com/59665246/128732573-abfbc293-645d-4c12-95a6-518473157905.mp4)
+https://user-images.githubusercontent.com/59665246/128732573-abfbc293-645d-4c12-95a6-518473157905.mp4
 
 
