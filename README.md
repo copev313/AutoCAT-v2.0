@@ -1,5 +1,5 @@
 # AutoCAT v2.0 (Selenium Category Build Automation)
- The automation you need for the jobs your don't! This is an automated workflow project for a simple task that I'm tired of doing manually.
+ The automation you need for the jobs your don't! This is an automated workflow project for a simple task that I got tired of doing manually.
 
 ## Setup:
 
@@ -38,3 +38,13 @@
  (It currently needs little to no intervention, but a human eye is recommended to ensure that the category is created properly.)
 
  - NOTE: The company description will still need copy/pasted into the category description field.
+
+## Videos:
+
+Given that this program is very task specific and requires admin credentials to run through the process, checkout the videos below to see it in action!
+
+![Video 1](https://user-images.githubusercontent.com/59665246/128732593-367dc9b8-65a9-4866-886e-791e21b57278.mp4)
+
+![Video 2](https://user-images.githubusercontent.com/59665246/128732573-abfbc293-645d-4c12-95a6-518473157905.mp4)
+
+
