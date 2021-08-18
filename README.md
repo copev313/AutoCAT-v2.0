@@ -22,11 +22,11 @@
  - A .env file is required in the repo folder for the program to log into the website. The necessary variables are included in the block below, simply copy/paste, inserting the corresponding values for your account.
 
     ```
-    ADMIN_EMAIL=(your email)
-    ADMIN_PASSWORD=(your password)
+    ADMIN_EMAIL=
+    ADMIN_PASSWORD=
 
-    BACKEND_LOGIN_URL=(backend login portal URL)
-    BACKEND_LANDING_URL=(backend landing page URL)
+    BACKEND_LOGIN_URL=
+    BACKEND_LANDING_URL=
     ```
 
 ## Usage:
