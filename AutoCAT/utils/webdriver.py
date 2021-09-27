@@ -2,23 +2,22 @@
 webdriver.py
 ------------
     Class for building our Selenium Chrome webdriver.
-
 '''
 from selenium import webdriver
 
 
-# Our default & experimental option flags for configuring our Chrome webdriver:
+# Default & Experimental option flags for configuring our Chrome webdriver:
 DEFAULT_FLAGS = ["--start-maximized",
                  "--incognito",
                  "--disable-notifications",
-                 "--disable-extensions"]
+                 "--disable-extensions",
+                ]
 
-EXP_OPTS = ["enable-automation",
-            "enable-logging"]
+EXP_OPTS = ["enable-automation", "enable-logging"]
 
 
-class WebDriver:
-    '''A class for the Selenium Chrome webdriver.
+class MyWebDriver:
+    '''A class for building the Selenium Chrome webdriver.
 
     This object encapsulates methods for building a Chrome options object and
     initializing a Selenium automated browser/driver object.
@@ -33,58 +32,61 @@ class WebDriver:
             A list of experimental options that can be accepted by the Chrome
             Selenium webdriver. (default EXP_OPTS)
 
-    Properties
+    Parameters
     ----------
         flags : list [str]
-            Returns the current flags of the given instance of WebBrowser.
+            The current flags of the given instance of WebBrowser.
 
         exp_opts : list [str]
-            Returns the experimental flags of the given instance of WebBrowser.
+            The experimental flags of the given instance of WebBrowser.
 
     Methods
     -------
-        initialize_driver(headless=False):
-            Initializes the Selenium webdriver object.
+        initialize_driver():
+            Returns an initialized Selenium Chrome webdriver.
     '''
-    
+
     def __init__(self, flags: list = None, exp_opts: list = None):
         self._flags = flags if flags else DEFAULT_FLAGS
         self._exp_opts = exp_opts if exp_opts else EXP_OPTS
 
     @property
-    def flags(self):
+    def flags(self) -> list:
         return self._flags
 
     @property
-    def exp_opts(self):
+    def exp_opts(self) -> list:
         return self._exp_opts
 
 
-    def _build_options(self):
+    def _build_options(self) -> webdriver.ChromeOptions:
         '''Builds a ChromeOptions object for specifying special config settings
         for our Chrome webdriver.
 
-        * Used as a helper within `initialize_driver` function.
-
         Returns
         -------
-            _opts : webdriver.ChromeOptions object
+            selenium.webdriver.ChromeOptions
         '''
         _opts = webdriver.ChromeOptions()
+
+        # Add default flags:
         for flag in self._flags:
             _opts.add_argument(flag)
+
+        # Add experimental flags:
         _opts.add_experimental_option("excludeSwitches", self._exp_opts)
-        # Supposed to keep the browser open:
+
+        # Option to keep the web browser open after program is finished:
         _opts.add_experimental_option("detach", True)
         return _opts
 
 
-    def initialize_driver(self):
+    def initialize_driver(self) -> webdriver.Chrome:
         '''Initializes and returns a Google Chrome webdriver used to perform
         automated tasks in the browser.
 
         Returns
         -------
-            webdriver.Chrome selenium object
+            selenium.webdriver.Chrome
         '''
         return webdriver.Chrome(options=self._build_options())

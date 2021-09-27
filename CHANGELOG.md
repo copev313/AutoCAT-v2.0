@@ -16,14 +16,9 @@ All pre-release fixes and changes made between the dates above are listed here.
  
 ### Removed
  
-## [1.0.1] - MM/DD/YYYY
+## [1.1.0] - 08/13/2021
   
 Official Release!
- 
-### Added
- 
-### Changed
- 
-### Fixed
 
-### Removed
+### Added
+- A .bat file was added to make activating virtual environments easier.

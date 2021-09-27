@@ -3,7 +3,6 @@ app.py
 ------
     Our entry point for getting our Gooey GUI initialized and running.
 """
-import os
 import sys
 from time import time
 
@@ -11,8 +10,7 @@ import validators
 from gooey import Gooey, GooeyParser
 
 from procedures.approve_vendor import ApproveVendorProcess
-from utils.helper_funcs import check_email
-from utils.webdriver import WebDriver
+from utils.webdriver import MyWebDriver
 
 
 PROG_NAME = "AutoCAT: The Automation You Need For the Jobs You Don't!"
@@ -35,9 +33,12 @@ def goopy():
     """The main function responsible for parsing our arguments and building our
     Gooey GUI.
     """
+    # Start timer:
+    start = time()
+
     parser = GooeyParser(prog="AutoCAT", description=f"\n{PROG_DESC}")
 
-    # Vendor Email field:
+    # Accept argument for the vendor's email address:
     parser.add_argument(
         "Vendor", action="store", type=str, help="Vendor's email address:"
     )
@@ -46,7 +47,7 @@ def goopy():
     args = parser.parse_args()
     email_input = args.Vendor
 
-    # Validation for Vendor Emails:
+    # [CHECK] Validation for Vendor Emails:
     if (not validators.email(email_input)):
         print("Vendor field may only contain email addresses!")
         raise ValueError
@@ -54,41 +55,29 @@ def goopy():
     print("\nLaunching Approval Process . . .")
 
     # Initialize our WebDriver + Procedures classes:
-    driver = WebDriver().initialize_driver()
+    driver = MyWebDriver().initialize_driver()
     approve = ApproveVendorProcess(driver)
 
-    # Log into backend as admin:
-    approve.backend_admin_login()
-    # Search for the vendor page by email:
-    approve.vendor_email_search(email_input)
-    # Copy/Paste account info:
-    approve.complete_vendor_account()
-    # Complete Coming Soon Page:
-    approve.complete_coming_soon_page()
-    # Complete the Category Page:
-    approve.complete_category_page()
-    # Clean up:
-    approve.clean_up()
-    # Add Vendor Stats to MongoDB:
-    approve.save_stats_to_db()
+    # Run all procedures:
+    approve.run_all(email_input)
+    delta = round(time() - start, 3)
+    print(f"\n ---- Completed in {delta} seconds total. ----")
 
 
 # Run Gooey Program:
 if __name__ == "__main__":
 
     try:
-        start = time()
         goopy()
-        print(
-            f"\n ----- Completed in { round(time() - start, 3) } seconds total. -----"
-        )
 
     except KeyboardInterrupt:
         print("CANCELLED!")
         sys.exit(1)
+
     except ValueError as err:
         print(f"\nVALUE ERROR: {str(err)}")
         sys.exit(1)
+
     except Exception as err:
         print(f"\nERROR ENCOUNTERED! CLOSING ...\n{err}")
         sys.exit(1)

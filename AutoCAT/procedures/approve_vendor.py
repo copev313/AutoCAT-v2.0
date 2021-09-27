@@ -1,9 +1,8 @@
 """
 approve_vendor.py
 ------------------
-    The class for running processes required to approve & create vendor
-    categories. This module focuses on procedures necessary to complete the
-    approval process.
+    This module focuses on procedures necessary to complete the
+    category approval process.
 """
 import os
 from time import sleep
@@ -19,15 +18,14 @@ from xpaths.approved_paths import (
     ACCOUNT_HEADER, QUESTIONS_EMAIL_FIELD, COUNTRY_DD, STATE_AS_DD,
     STATE_AS_FIELD, CITY_FIELD, CA_SUBMIT_BUTTON,
 
-    TRUSTED_DD, LOCATION_FIELD, WEBSITE_FIELD, INSTAGRAM_FIELD,
-    MINIMUM_ORDER_DD, COMPANY_DESC_FIELD, CD_UPDATE_BUTTON,
+    TRUSTED_DD, LOCATION_FIELD, WEBSITE_FIELD, INSTAGRAM_FIELD, 
+    COMPANY_DESC_FIELD, CD_UPDATE_BUTTON,
 
     # Complete Coming Soon Page:
     NEW_CATEGORY_BUTTON, NEW_CATEGORY_FIELD, SAVE_CHANGES_BUTTON,
     FIRST_POS_NAME, FIRST_POS_DIV, FIRST_CAT_POS_INPUT,
 
     # Complete Category Page:
-    #DESCRIPTION_TEXTAREA,
     CLEAN_URL_FIELD, SHOW_SEARCH_BOX_SWITCH, CATEGORY_UPDATE_BUTTON,
 
     # Clean Up:
@@ -37,8 +35,7 @@ from dotenv import load_dotenv
 from selenium.webdriver.common.keys import Keys
 from utils.helper_funcs import (address_handler, check_condition, 
                                 check_is_clickable, format_instagram_handle,
-                                minimum_order_amount_handler, timer, 
-                                wait_for_save)
+                                timer, wait_for_save)
 from utils.database import add_vendor_to_db
 
 class ApproveVendorProcess:
@@ -47,7 +44,7 @@ class ApproveVendorProcess:
 
     Attributes:
     ----------
-        driver : Selenium webdriver
+        driver : selenium.webdriver.Chrome
             The web browser object used to pass in procedures.
 
     Methods:
@@ -71,6 +68,9 @@ class ApproveVendorProcess:
         clean_up():
             Finishes the CAT build process. Tears down any unnecessary
             resources.
+
+        run_all():
+            Runs all of the above methods in order.
     """
 
     # Wait time (in seconds) for WebDriverWait events:
@@ -179,7 +179,6 @@ class ApproveVendorProcess:
         _driver = self._driver
 
         ''' * * * * * Grab Info from 'Account Details' tab * * * * * '''
-
         # [CHECK] Confirm we successfully loaded the page:
         check_condition(_driver, ACCOUNT_HEADER)
 
@@ -196,8 +195,8 @@ class ApproveVendorProcess:
         self._vendor_email_address = email_address
         self._brand_name = brand_name
 
-        ''' * * * * * Complete 'Company Address' tab * * * * * '''
 
+        ''' * * * * * Complete 'Company Address' tab * * * * * '''
         # Form the URL for the Company Address tab:
         address_tab_url = "{root}?target=companyAddress&profile_id={id}"\
                             .format(
@@ -249,8 +248,8 @@ class ApproveVendorProcess:
         print("State: " + self._company_state)
         print("Country: " + self._company_country)
 
-        ''' * * * * * Complete 'Company Details' tab * * * * * '''
 
+        ''' * * * * * Complete 'Company Details' tab * * * * * '''
         # Form the URL for the Company Details tab:
         company_details_url = "{root}?target=vendor&profile_id={id}"\
                                 .format(
@@ -365,11 +364,11 @@ class ApproveVendorProcess:
         splitted = link_href.split('=')
         self._category_id = splitted[-1]
 
-        # Change category position to 10,000:
+        # Change category position to 15,000:
         _pos_div = _driver.find_element_by_xpath(FIRST_POS_DIV)
         _pos_div.click()
         _pos_input = _driver.find_element_by_xpath(FIRST_CAT_POS_INPUT)
-        _pos_input.send_keys('10000')
+        _pos_input.send_keys('15000')
 
         # Save changes:
         _save_btn = _driver.find_element_by_xpath(SAVE_CHANGES_BUTTON)
@@ -402,8 +401,8 @@ class ApproveVendorProcess:
         # [CHECK] The category page successfully loaded:
         check_condition(_driver, CLEAN_URL_FIELD)
 
-        # (1) Paste the description into the 'Description' textarea element:
-        # TODO
+        # (1) TODO: 
+        # Paste the description into the 'Description' textarea element:
 
         # (2) Complete the 'Clean URL' field:
         _clean_url_field = _driver.find_element_by_xpath(CLEAN_URL_FIELD)
@@ -445,7 +444,7 @@ class ApproveVendorProcess:
     def clean_up(self):
         '''Finishes the CAT build process & tears down any unnecessary
         resources.'''
-        
+
         print("\n🧼  Cleaning Up")
         _driver = self._driver
 
@@ -499,3 +498,20 @@ class ApproveVendorProcess:
 
         add_vendor_to_db(profile_id, category_id, email, brand_name, location,
                          web_url, instagram)
+
+
+    def run_all(self, email: str) -> None:
+        '''Runs the entire CAT build process.
+        
+        Parameters
+        ----------
+            email : str
+                The vendor's email address.
+        '''
+        self.backend_admin_login()
+        self.vendor_email_search(email)
+        self.complete_vendor_account()
+        self.complete_coming_soon_page()
+        self.complete_category_page()
+        self.clean_up()
+        self.save_stats_to_db()
