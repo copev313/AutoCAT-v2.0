@@ -22,11 +22,13 @@
  - A .env file is required in the repo folder for the program to log into the website. The necessary variables are included in the block below, simply copy/paste, inserting the corresponding values for your account.
 
     ```
-    ADMIN_EMAIL=
-    ADMIN_PASSWORD=
+    ADMIN_EMAIL=(your email)
+    ADMIN_PASSWORD=(your password)
 
-    BACKEND_LOGIN_URL=
-    BACKEND_LANDING_URL=
+    BACKEND_LOGIN_URL=(URL of the backend login page)
+    BACKEND_LANDING_URL=(URL of the backend landing page - after log in)
+
+    MONGO_HOST=(MongoDB URI)
     ```
 
 ## Usage:
