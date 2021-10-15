@@ -27,8 +27,6 @@
 
     BACKEND_LOGIN_URL=(URL of the backend login page)
     BACKEND_LANDING_URL=(URL of the backend landing page - after log in)
-
-    MONGO_HOST=(MongoDB URI)
     ```
 
 ## Usage:
