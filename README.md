@@ -1,7 +1,7 @@
 # AutoCAT v2.0 (Selenium Category Build Automation)
  The automation you need for the jobs your don't! This is an automated workflow project for a simple task that I'm tired of doing manually.
 
-## Setup:
+## Initial Setup:
 
  - Inside the repo folder create your virtual environment:
 
@@ -40,3 +40,24 @@
  (It currently needs little to no intervention, but a human eye is recommended to ensure that the category is created properly.)
 
  - NOTE: The company description will still need copy/pasted into the category description field.
+
+-----
+
+## Convenience Commands:
+
+   *Once initial setup is complete*, and any changes saved, the following command can be ran via the terminal from the repo folder to activate the virtual environment and launch the program:
+
+   ```setup```
+
+
+   **IMPORTANT:**
+
+   *After the `setup` command is ran*, subsequent launches of the program can be accomplished by using the following command from the 'AutoCAT' directory:
+
+   ```run```
+
+-----
+
+## Additional Notes:
+
+   - Nothing yet...
