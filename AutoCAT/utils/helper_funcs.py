@@ -207,16 +207,3 @@ def format_instagram_handle(handle: str):
         return handle.lower()
 
     return None
-
-
-def minimum_order_amount_handler(inner_text: str) -> int:
-    if inner_text:
-        if (inner_text.contains('No minimum')):
-            return None
-        elif (inner_text.contains('$50')):
-            return 50
-        elif (inner_text.contains('$100')):
-            return 100
-        elif (inner_text.contains('$250')):
-            return 250
-    return None

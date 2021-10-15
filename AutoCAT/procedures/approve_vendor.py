@@ -36,7 +36,6 @@ from selenium.webdriver.common.keys import Keys
 from utils.helper_funcs import (address_handler, check_condition, 
                                 check_is_clickable, format_instagram_handle,
                                 timer, wait_for_save)
-from utils.database import add_vendor_to_db
 
 class ApproveVendorProcess:
     """Class used to trigger actions for the approval process using the
@@ -145,7 +144,7 @@ class ApproveVendorProcess:
             email : str
                 The vendor's email address.
         '''
-        
+
         print("\n🐱  Vendor Email Search")
         _driver = self._driver
         
@@ -480,26 +479,6 @@ class ApproveVendorProcess:
         wait_for_save(_driver, CD_UPDATE_BUTTON)
 
 
-    @timer
-    def save_stats_to_db(self):
-        '''Saves the newly created vendor category information to MongoDB.'''
-        profile_id = self._profile_id
-        category_id = self._category_id
-        email = self._vendor_email_address
-        brand_name = self._brand_name
-        city, state, country = (self._company_city,
-                                self._company_state,
-                                self._company_country)
-        location = f"{city or 'NOCITY'}, "
-        location += f"{state or 'NOSTATE'}, "
-        location += f"{country or 'NOCOUNTRY'}"
-        web_url = self._website_url
-        instagram = self._instagram_handle
-
-        add_vendor_to_db(profile_id, category_id, email, brand_name, location,
-                         web_url, instagram)
-
-
     def run_all(self, email: str) -> None:
         '''Runs the entire CAT build process.
         
@@ -514,4 +493,3 @@ class ApproveVendorProcess:
         self.complete_coming_soon_page()
         self.complete_category_page()
         self.clean_up()
-        self.save_stats_to_db()
